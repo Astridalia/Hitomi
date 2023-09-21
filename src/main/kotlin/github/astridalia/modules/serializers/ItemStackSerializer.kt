@@ -25,11 +25,16 @@ object ItemStackSerializer : KSerializer<ItemStack> {
     @OptIn(ExperimentalSerializationApi::class)
     override fun serialize(encoder: Encoder, value: ItemStack) {
         encoder.encodeStructure(descriptor) {
-           encodeStringElement(descriptor, 0, value.type.name)
+            encodeStringElement(descriptor, 0, value.type.name)
             encodeIntElement(descriptor, 1, value.amount)
             encodeShortElement(descriptor, 2, value.durability)
             encodeNullableSerializableElement(descriptor, 3, String.serializer().nullable, value.itemMeta!!.displayName)
-            encodeNullableSerializableElement(descriptor, 4, ListSerializer(String.serializer()).nullable, value.itemMeta!!.lore)
+            encodeNullableSerializableElement(
+                descriptor,
+                4,
+                ListSerializer(String.serializer()).nullable,
+                value.itemMeta!!.lore
+            )
             encodeIntElement(descriptor, 5, value.itemMeta!!.customModelData)
         }
     }
@@ -64,15 +69,15 @@ object ItemStackSerializer : KSerializer<ItemStack> {
             itemMeta.setDisplayName(displayName)
             itemMeta.lore = lore
             itemMeta.setCustomModelData(modelId)
-            itemStack.durability=durability
-            
-            
+            itemStack.durability = durability
+
+
             itemStack.setItemMeta(itemMeta)
-            
+
             itemStack
-            
+
         }
     }
 
-    
+
 }

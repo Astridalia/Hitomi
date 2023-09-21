@@ -2,8 +2,8 @@ package github.astridalia
 
 import github.astridalia.database.MongoStorage
 import github.astridalia.events.TestItemsListener
-import github.astridalia.items.SerializedItemStack
 import github.astridalia.items.CustomEnchantments
+import github.astridalia.items.SerializedItemStack
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent

@@ -1,6 +1,6 @@
 package github.astridalia.events
 
-enum class CustomAttributeType  {
+enum class CustomAttributeType {
 
     ChaosElement,
     SpiritElement,

@@ -1,6 +1,6 @@
 package github.astridalia.inventory.shop
 
-interface Shop  {
+interface Shop {
 
     fun purchaseItem(id: String, quantity: Int): Boolean
 

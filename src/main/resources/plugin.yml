@@ -1,0 +1,5 @@
+main: github.astridalia.HitomiPlugin
+name: HitomiPlugin
+version: 1.0-dev
+api-version: 1.20
+author: Auuki

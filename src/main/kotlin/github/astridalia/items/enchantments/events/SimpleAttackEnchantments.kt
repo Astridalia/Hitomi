@@ -25,14 +25,10 @@ object SimpleAttackEnchantments : Listener, KoinComponent {
         val item = player.itemInHand
 
         val charged = customEnchantments.getFrom(item, HyperionEnchantments.CHARGED)
-        if (charged > 0) {
-            e.entity.location.world?.spawn(e.entity.location, LightningStrike::class.java)
-        }
+        if (charged > 0) e.entity.location.world?.spawn(e.entity.location, LightningStrike::class.java)
 
         val fiery = customEnchantments.getFrom(item, HyperionEnchantments.FIERY)
-        if (fiery > 0) {
-            e.entity.fireTicks = (500L * fiery).toInt()
-        }
+        if (fiery > 0) e.entity.fireTicks = (500L * fiery).toInt()
     }
 
     @EventHandler

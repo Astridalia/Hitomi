@@ -31,6 +31,7 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         single { ExplodingArrow }
         single { CubicMiningBlocks }
         single { SimpleAttackEnchantments }
+
     }
 
     private val simpleAttackEnchantments: SimpleAttackEnchantments by inject()

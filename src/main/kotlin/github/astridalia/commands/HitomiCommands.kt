@@ -23,7 +23,7 @@ object HitomiCommands : BaseCommand() {
     @CommandPermission("hitomi.admin")
     fun openinv(player: Player) {
         player.closeInventory()
-        player.openInventory(CustomEnchantmentInventory.enchantInventory)
+        player.openInventory(CustomEnchantmentInventory.hitomiEnchantInv)
     }
 
     @Subcommand("enchant")
@@ -64,14 +64,18 @@ object HitomiCommands : BaseCommand() {
         val itemInUse = player.inventory.itemInMainHand
         val container = itemInUse.itemMeta?.persistentDataContainer ?: return
         val containers = container.keys.associateWith {
-            container.get(it, PersistentDataType.STRING) ?: "null"
+            container.get(it, PersistentDataType.STRING)
         }
         val message = buildString {
             appendLine("Data in containers:")
             containers.forEach { (key, value) ->
-                appendLine("$key: $value")
+                appendLine("$key: ${value.toString()}")
             }
         }
         player.sendMessage(message)
     }
+
+
+
+
 }

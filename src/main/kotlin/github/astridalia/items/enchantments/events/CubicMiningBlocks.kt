@@ -2,6 +2,7 @@ package github.astridalia.items.enchantments.events
 
 import github.astridalia.items.enchantments.CustomEnchantments
 import github.astridalia.items.enchantments.HyperionEnchantments
+import kotlinx.coroutines.*
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.block.Block
@@ -9,6 +10,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitRunnable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

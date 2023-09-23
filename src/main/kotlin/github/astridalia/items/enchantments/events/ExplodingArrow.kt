@@ -15,7 +15,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 object ExplodingArrow : Listener, KoinComponent {
-    private val explosionPower = 2.5f
+    private const val power = 2.5f
     private val arrowShooters: MutableMap<Arrow, Player> = HashMap()
 
     private val customEnchantments: CustomEnchantments by inject()
@@ -37,7 +37,7 @@ object ExplodingArrow : Listener, KoinComponent {
         val explodingLevel =
             customEnchantments.getFrom(shooter.inventory.itemInMainHand, HyperionEnchantments.EXPLODING_ARROW)
         if (explodingLevel <= 0) return
-        explodeArrow(arrow, explosionPower * explodingLevel)
+        explodeArrow(arrow, power * explodingLevel)
     }
 
     private fun explodeArrow(arrow: Arrow, explosionPower: Float) {

@@ -14,27 +14,21 @@ import org.koin.core.component.inject
 object CustomEnchantments : KoinComponent {
     private val javaPlugin: JavaPlugin by inject()
 
-    fun applyTo(
-        itemStack: ItemStack,
-        level: Int = 1,
-        hyperionEnchantments: HyperionEnchantments,
-        dynamicLore: DynamicLore = DynamicLore()
-    ) {
-        val key = NamespacedKey(javaPlugin, hyperionEnchantments.name.replace(" ", "_"))
+    fun applyTo(itemStack: ItemStack, level: Int = 1, hyperionEnchantments: HyperionEnchantments) {
+        val key = enchantmentKey(hyperionEnchantments)
         val itemMeta = itemStack.itemMeta ?: return
-        modifyLore(itemMeta, hyperionEnchantments, dynamicLore, level)
-        applyOtherProperties(itemMeta)
+        modifyItem(itemMeta, hyperionEnchantments, level)
+        applyProperties(itemMeta)
         setCustomEnchantmentLevel(itemMeta, key, level)
         itemStack.itemMeta = itemMeta
     }
 
-    fun removeFrom(itemStack: ItemStack, hyperionEnchantments: HyperionEnchantments, dynamicLore: DynamicLore) {
+    fun removeFrom(itemStack: ItemStack, hyperionEnchantments: HyperionEnchantments) {
         val itemMeta = itemStack.itemMeta ?: return
-        val key = NamespacedKey(javaPlugin, hyperionEnchantments.name.replace(" ", "_"))
-        val container = itemMeta.persistentDataContainer
-        container.remove(key)
-        modifyLore(itemMeta, hyperionEnchantments, dynamicLore)
-        removeOtherProperties(itemMeta)
+        val key = enchantmentKey(hyperionEnchantments)
+        itemMeta.persistentDataContainer.remove(key)
+        modifyItem(itemMeta, hyperionEnchantments)
+        removeProperties(itemMeta)
         itemStack.itemMeta = itemMeta
     }
 
@@ -43,41 +37,40 @@ object CustomEnchantments : KoinComponent {
         enchantmentBook: ItemStack,
         hyperionEnchantments: HyperionEnchantments
     ): Boolean {
-        val itemToEnchant = getFrom(itemStack, hyperionEnchantments)
-        val enchantmentBookLevel = getFrom(enchantmentBook, hyperionEnchantments)
-        when {
-            !hyperionEnchantments.isRightMaterial(hyperionEnchantments, itemStack.type) -> return false
-            itemToEnchant >= hyperionEnchantments.maxLevel -> return false
-            itemToEnchant <= 0 -> applyTo(itemStack, enchantmentBookLevel, hyperionEnchantments)
-            itemToEnchant == enchantmentBookLevel -> {
-                removeFrom(itemStack, hyperionEnchantments, DynamicLore())
-                applyTo(itemStack, itemToEnchant + 1, hyperionEnchantments, DynamicLore())
-            }
-
-            itemToEnchant < enchantmentBookLevel -> return false
-        }
+        val itemLevel = getFrom(itemStack, hyperionEnchantments)
+        val bookLevel = getFrom(enchantmentBook, hyperionEnchantments)
+        if (!canEnchant(itemStack, hyperionEnchantments, bookLevel)) return false
+        if (itemLevel == bookLevel)
+            applyTo(itemStack, itemLevel + 1, hyperionEnchantments) else applyTo(
+            itemStack,
+            hyperionEnchantments = hyperionEnchantments
+        )
         return true
     }
 
-    fun getFrom(itemStack: ItemStack, hyperionEnchantments: HyperionEnchantments): Int {
-        val itemMeta = itemStack.itemMeta ?: return 0
-        val key = NamespacedKey(javaPlugin, hyperionEnchantments.name.replace(" ", "_"))
-        val container = itemMeta.persistentDataContainer
-        return container.getOrDefault(key, PersistentDataType.INTEGER, 0)
-    }
+    fun getFrom(itemStack: ItemStack, hyperionEnchantments: HyperionEnchantments): Int =
+        itemStack.itemMeta?.let { itemMeta ->
+            val key = enchantmentKey(hyperionEnchantments)
+            val container = itemMeta.persistentDataContainer
+            container.getOrDefault(key, PersistentDataType.STRING, "0")
+        }?.toInt() ?: 0
 
-    private fun modifyLore(
-        itemMeta: ItemMeta,
-        hyperionEnchantments: HyperionEnchantments,
-        dynamicLore: DynamicLore,
-        level: Int = 1
-    ) {
-        val displayString = hyperionEnchantments.displayLevel(hyperionEnchantments, level)
+    private fun enchantmentKey(hyperionEnchantments: HyperionEnchantments): NamespacedKey =
+        NamespacedKey(javaPlugin, hyperionEnchantments.name.replace(" ", "_"))
+
+    private fun canEnchant(itemStack: ItemStack, hyperionEnchantments: HyperionEnchantments, bookLevel: Int): Boolean =
+        hyperionEnchantments.isRightMaterial(itemStack.type) &&
+                getFrom(itemStack, hyperionEnchantments) < hyperionEnchantments.maxLevel &&
+                getFrom(itemStack, hyperionEnchantments) <= bookLevel
+
+    private fun modifyItem(itemMeta: ItemMeta, hyperionEnchantments: HyperionEnchantments, level: Int = 1) {
+        val displayString = hyperionEnchantments.displayName(level)
+        val dynamicLore = DynamicLore()
         dynamicLore.addLineToSection("Enchantments", displayString)
         itemMeta.lore = dynamicLore.toLoreList()
     }
 
-    private fun applyOtherProperties(itemMeta: ItemMeta) {
+    private fun applyProperties(itemMeta: ItemMeta) {
         itemMeta.isUnbreakable = true
         itemMeta.addEnchant(Enchantment.DURABILITY, 1, true)
         itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ENCHANTS)
@@ -85,10 +78,10 @@ object CustomEnchantments : KoinComponent {
 
     private fun setCustomEnchantmentLevel(itemMeta: ItemMeta, key: NamespacedKey, level: Int) {
         val container = itemMeta.persistentDataContainer
-        container.set(key, PersistentDataType.INTEGER, level)
+        container.set(key, PersistentDataType.STRING, level.toString())
     }
 
-    private fun removeOtherProperties(itemMeta: ItemMeta) {
+    private fun removeProperties(itemMeta: ItemMeta) {
         itemMeta.removeEnchant(Enchantment.DURABILITY)
     }
 }

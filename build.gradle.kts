@@ -26,7 +26,7 @@ dependencies {
     implementation("org.litote.kmongo:kmongo:4.10.0")
     implementation("io.insert-koin:koin-core:3.4.3")
     implementation("org.reflections:reflections:0.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     implementation("com.mineinabyss:idofront-serializers:0.18.24")

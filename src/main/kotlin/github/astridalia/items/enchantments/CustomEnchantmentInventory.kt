@@ -2,6 +2,7 @@ package github.astridalia.items.enchantments
 
 import github.astridalia.items.SerializedItemStack
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -13,9 +14,9 @@ import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 
-
 object CustomEnchantmentInventory : KoinComponent, Listener {
-    val enchantInventory = Bukkit.createInventory(null, InventoryType.CHEST, "Hitomi's Enchanting")
+    val hitomiEnchantInv =
+        Bukkit.createInventory(null, InventoryType.CHEST, "${ChatColor.DARK_PURPLE}Hitomi's Enchanting")
 
     private const val ENCHANTMENT_ITEM_SLOT = 11
     private const val ENCHANTMENT_BOOK_SLOT = 13
@@ -25,18 +26,17 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
     @EventHandler
     fun onInventoryOpen(e: InventoryOpenEvent) {
         val inventory = e.inventory
-        if (inventory !== enchantInventory) return
+        if (inventory !== hitomiEnchantInv) return
         val decoration = SerializedItemStack(type = Material.BLACK_STAINED_GLASS_PANE.name)
         (0..<27)
             .filter {
                 it !in arrayOf(
                     ENCHANTMENT_BOOK_SLOT,
                     ENCHANTMENT_ITEM_SLOT,
-//                    ITEM_PROTECTION_SLOT,
                     CONFIRMATION_ITEM_ENCHANT
                 )
             }
-            .forEach { enchantInventory.setItem(it, decoration.toItemStack()) }
+            .forEach { hitomiEnchantInv.setItem(it, decoration.toItemStack()) }
         inventory.setItem(
             CONFIRMATION_ITEM_ENCHANT,
             SerializedItemStack(type = Material.CYAN_STAINED_GLASS_PANE.name, name = "Enchant item").toItemStack()
@@ -60,21 +60,18 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
 
         val player = e.player as? Player ?: return
         returnItemToPlayerSlot(itemBook, player, ENCHANTMENT_BOOK_SLOT)
-//        returnItemToPlayerSlot(itemProtection, player, ITEM_PROTECTION_SLOT)
         returnItemToPlayerSlot(item, player, ENCHANTMENT_ITEM_SLOT)
     }
 
     @EventHandler
     fun onClick(e: InventoryClickEvent) {
         val inventory = e.clickedInventory ?: return
-        if (inventory !== enchantInventory) return
+        if (inventory !== hitomiEnchantInv) return
         if (e.rawSlot in 0..<27 && e.rawSlot !in arrayOf(
                 ENCHANTMENT_BOOK_SLOT,
-                ENCHANTMENT_ITEM_SLOT,
-                ITEM_PROTECTION_SLOT
+                ENCHANTMENT_ITEM_SLOT
             )
         ) e.isCancelled = true
-        val player = e.whoClicked as? Player ?: return
         val enchantmentBook = inventory.getItem(ENCHANTMENT_BOOK_SLOT)
         val itemToEnchant = inventory.getItem(ENCHANTMENT_ITEM_SLOT) ?: return
         if (e.rawSlot != CONFIRMATION_ITEM_ENCHANT || enchantmentBook == null) return
@@ -82,7 +79,6 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
             val enchantment = HyperionEnchantments.matches(key.key) ?: return@forEach
             if (CustomEnchantments.increaseEnchantmentLevelOrApply(itemToEnchant, enchantmentBook, enchantment)) {
                 e.inventory.setItem(ENCHANTMENT_BOOK_SLOT, null)
-//                e.inventory.setItem(ITEM_PROTECTION_SLOT, null)
             }
         }
     }

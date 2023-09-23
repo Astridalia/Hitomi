@@ -18,8 +18,11 @@ data class SerializedItemStack(
     val name: String = "test_item",
     val lore: MutableList<String> = mutableListOf(),
     val model: Int = 0,
-    val persistentData: MutableMap<String, String> = hashMapOf("timestamp" to System.currentTimeMillis().toString())
+    val persistentData: MutableMap<String, String> = hashMapOf("timestamp" to System.currentTimeMillis().toString()),
+    val dynamicLore: DynamicLore = DynamicLore()
 ) {
+
+
     fun addData(name: String, value: String) {
         persistentData.putIfAbsent(name, value)
     }

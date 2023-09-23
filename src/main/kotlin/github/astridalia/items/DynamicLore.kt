@@ -1,32 +1,15 @@
 package github.astridalia.items
 
-class DynamicLore {
-    private val loreMap: MutableMap<String, MutableList<String>> = mutableMapOf()
+import kotlinx.serialization.Serializable
 
-    fun addSection(section: String, lines: MutableList<String> = mutableListOf()) {
-        loreMap[section] = lines
-    }
 
-    fun addLinesToSection(section: String, block: MutableList<String>.() -> Unit) {
-        loreMap.getOrPut(section) { mutableListOf() }.apply(block)
-    }
+// TODO: Revamp this entire class, because its inaccurate and doesn't work properly.
+// NOTE: We should add in more functionality for shifting down on an item to show more info!
 
-    fun findItemInSection(section: String, itemToFind: String): Int {
-        val lines = loreMap[section] ?: return -1
-        return lines.indexOf(itemToFind)
-    }
-
-    fun updateItemInSection(section: String, oldItem: String, newItem: String): Boolean {
-        val lines = loreMap[section] ?: return false
-        val index = findItemInSection(section, oldItem)
-
-        if (index != -1) {
-            lines[index] = newItem
-            return true
-        }
-
-        return false
-    }
+@Serializable
+data class DynamicLore(
+    val loreMap: MutableMap<String, MutableList<String>> = mutableMapOf()
+) {
 
     fun addLineToSection(section: String, line: String) {
         loreMap.getOrPut(section) { mutableListOf() } += line
@@ -46,6 +29,7 @@ class DynamicLore {
         }
     }
 }
+
 
 
 

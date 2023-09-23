@@ -12,7 +12,7 @@ class DynamicLore {
     }
 
     fun addLineToSection(section: String, line: String) {
-        loreMap.getOrPut(section) { mutableListOf() }.add(line)
+        loreMap.getOrPut(section) { mutableListOf() } += line
     }
 
     fun removeLineFromSection(section: String, line: String) {
@@ -21,10 +21,13 @@ class DynamicLore {
 
     fun toLoreList(): List<String> {
         return loreMap.flatMap { (section, lines) ->
-            if (lines.isNotEmpty() && section != "ignoreSection") listOf("[$section]") + lines + listOf("") else {
+            if (lines.isNotEmpty() && section != "ignoreSection") {
+                listOf("[$section]") + lines + ""
+            } else {
                 emptyList()
             }
         }
     }
 }
+
 

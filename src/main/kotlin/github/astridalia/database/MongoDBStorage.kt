@@ -1,16 +1,17 @@
 package github.astridalia.database
 
+
 import com.mongodb.MongoClientSettings.builder
 import com.mongodb.client.model.UpdateOptions
 import org.bson.UuidRepresentation
 import org.litote.kmongo.*
 
-class MongoStorage<T : Any>(clazz: Class<T>, databaseName: String, collectName: String) : Storage<T> {
-    private val mongoClientSettings =
-        builder().uuidRepresentation(UuidRepresentation.STANDARD).build()
+open class MongoDBStorage<T : Any>(clazz: Class<T>, collectName: String) : Storage<T> {
+    private val mongodbClientSettings = builder().uuidRepresentation(UuidRepresentation.STANDARD)
+        .build()
 
-    private val mongoClient = KMongo.createClient(mongoClientSettings)
-    private val database = mongoClient.getDatabase(databaseName)
+    private val mongodbClient = KMongo.createClient(mongodbClientSettings)
+    private val database = mongodbClient.getDatabase("Hitomi")
     private val collection = database.getCollection(collectName, clazz)
 
     override fun insertOrUpdate(id: Id<T>, entity: T) {

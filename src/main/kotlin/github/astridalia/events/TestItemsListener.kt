@@ -1,15 +1,15 @@
 package github.astridalia.events
 
 import github.astridalia.character.*
-import github.astridalia.database.MongoStorage
-import github.astridalia.items.CustomEnchantments
-import github.astridalia.items.HyperionEnchantments
-import github.astridalia.items.SerializedItemStack
+import github.astridalia.database.CachedMongoDBStorage
+import github.astridalia.items.enchantments.CustomEnchantments
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.litote.kmongo.id.StringId
@@ -124,8 +124,10 @@ class TestItemsListener : Listener, KoinComponent {
         e.damage = calculateDamage(attackerStats, defenderStats)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private fun getProfileForEntity(entity: Entity): Profile? {
-        val testStats = MongoStorage(Profile::class.java, "test", "players")
+
+        val testStats = CachedMongoDBStorage(Profile::class.java, "players")
         val entityIdString = StringId<Profile>(entity.uniqueId.toString())
         return testStats.get(entityIdString)
     }
@@ -144,24 +146,16 @@ class TestItemsListener : Listener, KoinComponent {
     }
 
     @EventHandler
-    fun onJoin(e: PlayerMoveEvent) {
+    fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
-
-
-        val testStats = MongoStorage(Profile::class.java, "test", "players")
-        val playerIdString = StringId<Profile>(e.player.uniqueId.toString())
-        testStats.get(playerIdString) ?: run {
+        val testStats = CachedMongoDBStorage(Profile::class.java, "players")
+        val playerIdString = StringId<Profile>(player.uniqueId.toString())
+        val stats = testStats.get(playerIdString) ?: run {
             val itemEntity = Profile(player.uniqueId.toString(), CharacterStats())
             testStats.insertOrUpdate(playerIdString, itemEntity)
             itemEntity
         }
-
-        val itemStorage = MongoStorage(SerializedItemStack::class.java, "test", "items")
-        val itemStringId = StringId<SerializedItemStack>("testing_items")
-        val item = itemStorage.get(itemStringId) ?: return
-        val createItemStack = item.createItemStack()
-
-        customEnchantments.applyTo(createItemStack, 1, HyperionEnchantments.EXPLODING_ARROW)
-        player.inventory.addItem(createItemStack)
+        println(stats)
     }
+
 }

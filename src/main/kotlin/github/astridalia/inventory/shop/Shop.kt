@@ -1,5 +1,8 @@
 package github.astridalia.inventory.shop
 
+import kotlinx.serialization.SerialName
+import org.bukkit.Location
+
 interface Shop {
 
     fun purchaseItem(id: String, quantity: Int): Boolean
@@ -8,8 +11,9 @@ interface Shop {
     fun isItemAvailable(id: String): Boolean
     fun getInventory(): Map<String, Int>
 
-    val shopName: String
+    @SerialName("_id")
+    val id: String
 
-    val shopLocation: String
+    val location: Location
 
 }

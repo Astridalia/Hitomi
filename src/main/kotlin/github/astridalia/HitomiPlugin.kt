@@ -1,9 +1,11 @@
 package github.astridalia
 
-import github.astridalia.database.MongoStorage
+import co.aikar.commands.PaperCommandManager
+import github.astridalia.commands.SummonItem
 import github.astridalia.events.TestItemsListener
-import github.astridalia.items.CustomEnchantments
-import github.astridalia.items.SerializedItemStack
+import github.astridalia.items.enchantments.CustomEnchantmentInventory
+import github.astridalia.items.enchantments.CustomEnchantments
+import github.astridalia.mobs.MobManager
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
@@ -11,18 +13,22 @@ import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
-import org.litote.kmongo.id.StringId
 
 
 class HitomiPlugin : JavaPlugin(), KoinComponent {
+
+    private lateinit var commandManager: PaperCommandManager
+
     private val appModule = module {
         single<JavaPlugin> { this@HitomiPlugin }
         single { TestItemsListener() }
-        single { CustomEnchantments() }
+        single { CustomEnchantments }
+        single { CustomEnchantmentInventory }
 
     }
 
     private val testItemsListener: TestItemsListener by inject()
+    private val customEnchantmentInventory: CustomEnchantmentInventory by inject()
 
     override fun onEnable() {
         System.setProperty(
@@ -30,23 +36,19 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
             "org.litote.kmongo.jackson.JacksonClassMappingTypeService"
         )
 
+        commandManager = PaperCommandManager(this)
+        commandManager.registerCommand(SummonItem)
+
         startKoin {
             modules(appModule)
         }
 
-        val itemStorage = MongoStorage(SerializedItemStack::class.java, "test", "items")
-        val itemStringId = StringId<SerializedItemStack>("testing_items")
-        itemStorage.get(itemStringId) ?: run {
-            val itemEntity = SerializedItemStack(
-                "STONE", 1, 2, "rare", mutableListOf()
-            )
-            itemStorage.insertOrUpdate(itemStringId, itemEntity)
-            itemEntity
-        }
         Bukkit.getPluginManager().registerEvents(testItemsListener, this)
+        Bukkit.getPluginManager().registerEvents(customEnchantmentInventory,this)
     }
 
     override fun onDisable() {
+        MobManager.cleanUp()
         stopKoin()
     }
 }

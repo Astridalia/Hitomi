@@ -1,5 +1,6 @@
-package github.astridalia.items
+package github.astridalia.items.enchantments
 
+import github.astridalia.items.DynamicLore
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
@@ -10,23 +11,20 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class CustomEnchantments : KoinComponent {
-
+object CustomEnchantments : KoinComponent {
     private val javaPlugin: JavaPlugin by inject()
 
     fun applyTo(
         itemStack: ItemStack,
-        level: Int,
+        level: Int = 1,
         hyperionEnchantments: HyperionEnchantments,
         dynamicLore: DynamicLore = DynamicLore()
     ) {
         val key = NamespacedKey(javaPlugin, hyperionEnchantments.name.replace(" ", "_"))
         val itemMeta = itemStack.itemMeta ?: return
-
-        modifyLore(itemMeta, hyperionEnchantments, level, dynamicLore)
+        modifyLore(itemMeta, hyperionEnchantments, dynamicLore)
         applyOtherProperties(itemMeta)
         setCustomEnchantmentLevel(itemMeta, key, level)
-
         itemStack.itemMeta = itemMeta
     }
 
@@ -35,7 +33,7 @@ class CustomEnchantments : KoinComponent {
         val key = NamespacedKey(javaPlugin, hyperionEnchantments.name.replace(" ", "_"))
         val container = itemMeta.persistentDataContainer
         container.remove(key)
-        modifyLore(itemMeta, hyperionEnchantments, 0, dynamicLore)
+        modifyLore(itemMeta, hyperionEnchantments, dynamicLore)
         removeOtherProperties(itemMeta)
         itemStack.itemMeta = itemMeta
     }
@@ -50,7 +48,6 @@ class CustomEnchantments : KoinComponent {
     private fun modifyLore(
         itemMeta: ItemMeta,
         hyperionEnchantments: HyperionEnchantments,
-        level: Int = 1,
         dynamicLore: DynamicLore
     ) {
         val displayString = hyperionEnchantments.display

@@ -3,25 +3,43 @@ package github.astridalia.commands
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
+import co.aikar.commands.annotation.Subcommand
 import github.astridalia.database.CachedMongoDBStorage
 import github.astridalia.items.SerializedItemStack
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
+import github.astridalia.items.enchantments.CustomEnchantments
+import github.astridalia.items.enchantments.HyperionEnchantments
+import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.litote.kmongo.id.StringId
 
 
 @CommandAlias("hitomi|hi")
 @CommandPermission("hitomi.commands")
-object SummonItem : BaseCommand("hitomi") {
+object HitomiCommands : BaseCommand() {
 
-
-    @CommandAlias("inventoryopen")
+    @Subcommand("inventory")
     @CommandPermission("hitomi.admin")
     fun openinv(player: Player) {
         player.closeInventory()
         player.openInventory(CustomEnchantmentInventory.enchantInventory)
     }
+
+
+    @Subcommand("enchant")
+    @CommandPermission("hitomi.enchanting.summon")
+    fun summonEnchant(id: String, level: Int, player: Player) {
+        val hyperionEnchantments = HyperionEnchantments.matches(id) ?: return
+        val itemStack = ItemStack(Material.ENCHANTED_BOOK, 1)
+        CustomEnchantments.applyTo(itemStack, level, hyperionEnchantments)
+        val remainingItems = player.inventory.addItem(itemStack)
+        if (remainingItems.isNotEmpty()) {
+            player.sendMessage("Your inventory is full. Some items could not be added.")
+        } else player.sendMessage("You have received the item.")
+    }
+
     @CommandAlias("item")
     @CommandPermission("hitomi.item")
     fun give(id: String, player: Player) {
@@ -42,7 +60,7 @@ object SummonItem : BaseCommand("hitomi") {
         } else player.sendMessage("You have received the item.")
     }
 
-    @CommandAlias("itemdata")
+    @CommandAlias("data")
     @CommandPermission("hitomi.admin")
     fun addData(player: Player) {
         val itemInUse = player.inventory.itemInMainHand

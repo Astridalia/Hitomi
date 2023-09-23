@@ -10,24 +10,29 @@ enum class HyperionEnchantments(val maxLevel: Int, val startingLevel: Int, val a
     HEALING_SPELL(5, 1, emptyList()),
     LIFEDRAIN_SPELL(5, 1, emptyList()),
     GRID_PICKAXE(5, 1, pickaxes),
-    PROJECTILE_MINING(5, 1, pickaxes),
-    SPECIAL_BEAM(5, 1, emptyList());
+    PROJECTILE_MINING(5, 1, pickaxes);
 
     fun isRightMaterial(hyperionEnchantments: HyperionEnchantments, material: Material): Boolean =
         hyperionEnchantments.applicableMaterials.contains(material)
 
-    val display: String
-        get() = "${ChatColor.GRAY}${name.replace('_', ' ').toLowerCase(Locale.getDefault())
-            .capitalizeWords()} ${ChatColor.AQUA}${startingLevel.toRoman()}"
+    fun displayLevel(hyperionEnchantments: HyperionEnchantments, level: Int = 1): String {
+        return "${ChatColor.GRAY}${
+            hyperionEnchantments.name.replace('_', ' ').lowercase(Locale.getDefault())
+                .capitalizeWords()
+        } ${ChatColor.AQUA}${level.toRoman()}"
+    }
 
     companion object {
+
+
         fun matches(name: String): HyperionEnchantments? {
-            val named = name.replace("hitomiplugin:","")
+            val named = name.replace("hitomiplugin:", "")
             return entries.find { it.name.equals(named, ignoreCase = true) }
         }
 
-
-
+        fun isAtMaxLevel(level: Int, hyperionEnchantments: HyperionEnchantments): Boolean {
+            return level >= hyperionEnchantments.maxLevel
+        }
     }
 }
 

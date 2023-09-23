@@ -2,10 +2,6 @@ package github.astridalia.mobs
 
 import github.astridalia.database.CachedMongoDBStorage
 import github.astridalia.items.SerializedItemStack
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
 import org.litote.kmongo.id.StringId
 import kotlin.random.Random

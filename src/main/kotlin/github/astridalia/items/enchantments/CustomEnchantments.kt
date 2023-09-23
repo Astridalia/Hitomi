@@ -22,7 +22,7 @@ object CustomEnchantments : KoinComponent {
     ) {
         val key = NamespacedKey(javaPlugin, hyperionEnchantments.name.replace(" ", "_"))
         val itemMeta = itemStack.itemMeta ?: return
-        modifyLore(itemMeta, hyperionEnchantments, dynamicLore)
+        modifyLore(itemMeta, hyperionEnchantments, dynamicLore, level)
         applyOtherProperties(itemMeta)
         setCustomEnchantmentLevel(itemMeta, key, level)
         itemStack.itemMeta = itemMeta
@@ -38,6 +38,23 @@ object CustomEnchantments : KoinComponent {
         itemStack.itemMeta = itemMeta
     }
 
+    fun increaseEnchantmentLevelOrApply(
+        itemStack: ItemStack,
+        enchantmentBook: ItemStack,
+        hyperionEnchantments: HyperionEnchantments
+    ): Boolean {
+        val itemToEnchant = getFrom(itemStack, hyperionEnchantments)
+        if (!hyperionEnchantments.isRightMaterial(hyperionEnchantments, itemStack.type)) return false
+        if (itemToEnchant <= 0) applyTo(itemStack, hyperionEnchantments = hyperionEnchantments) else {
+            val enchantmentBookLevel = getFrom(enchantmentBook, hyperionEnchantments)
+            if (itemToEnchant == enchantmentBookLevel) {
+                removeFrom(itemStack, hyperionEnchantments, DynamicLore())
+                applyTo(itemStack, itemToEnchant + 1, hyperionEnchantments, DynamicLore())
+            }
+        }
+        return true
+    }
+
     fun getFrom(itemStack: ItemStack, hyperionEnchantments: HyperionEnchantments): Int {
         val itemMeta = itemStack.itemMeta ?: return 0
         val key = NamespacedKey(javaPlugin, hyperionEnchantments.name.replace(" ", "_"))
@@ -48,9 +65,10 @@ object CustomEnchantments : KoinComponent {
     private fun modifyLore(
         itemMeta: ItemMeta,
         hyperionEnchantments: HyperionEnchantments,
-        dynamicLore: DynamicLore
+        dynamicLore: DynamicLore,
+        level: Int = 1
     ) {
-        val displayString = hyperionEnchantments.display
+        val displayString = hyperionEnchantments.displayLevel(hyperionEnchantments, level)
         dynamicLore.addLineToSection("Enchantments", displayString)
         itemMeta.lore = dynamicLore.toLoreList()
     }

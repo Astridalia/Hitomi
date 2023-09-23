@@ -1,6 +1,5 @@
 package github.astridalia.mobs
 
-import kotlinx.serialization.Contextual
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType

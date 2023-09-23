@@ -1,10 +1,12 @@
 package github.astridalia
 
 import co.aikar.commands.PaperCommandManager
-import github.astridalia.commands.SummonItem
+import github.astridalia.commands.HitomiCommands
 import github.astridalia.events.TestItemsListener
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
 import github.astridalia.items.enchantments.CustomEnchantments
+import github.astridalia.items.enchantments.events.CubicMiningBlocks
+import github.astridalia.items.enchantments.events.ExplodingArrow
 import github.astridalia.mobs.MobManager
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -24,8 +26,12 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         single { TestItemsListener() }
         single { CustomEnchantments }
         single { CustomEnchantmentInventory }
-
+        single { ExplodingArrow }
+        single { CubicMiningBlocks }
     }
+
+    private val explodingArrowEvent: ExplodingArrow by inject()
+    private val cubicMiningEvent: CubicMiningBlocks by inject()
 
     private val testItemsListener: TestItemsListener by inject()
     private val customEnchantmentInventory: CustomEnchantmentInventory by inject()
@@ -37,14 +43,20 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         )
 
         commandManager = PaperCommandManager(this)
-        commandManager.registerCommand(SummonItem)
+
+        commandManager.registerCommand(HitomiCommands)
 
         startKoin {
             modules(appModule)
         }
 
-        Bukkit.getPluginManager().registerEvents(testItemsListener, this)
-        Bukkit.getPluginManager().registerEvents(customEnchantmentInventory,this)
+        val pluginManager = Bukkit.getPluginManager()
+
+        pluginManager.registerEvents(testItemsListener, this)
+        pluginManager.registerEvents(customEnchantmentInventory, this)
+        pluginManager.registerEvents(explodingArrowEvent, this)
+        pluginManager.registerEvents(cubicMiningEvent, this)
+
     }
 
     override fun onDisable() {

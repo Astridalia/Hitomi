@@ -13,9 +13,9 @@ import org.bukkit.util.Vector
 data class Cuboid(
     @Serializable(with = WorldSerializer::class)
     var world: World,
-    @Serializable(with=VectorSerializer::class)
+    @Serializable(with = VectorSerializer::class)
     val minimumPoint: Vector,
-    @Serializable(with=VectorSerializer::class)
+    @Serializable(with = VectorSerializer::class)
     val maximumPoint: Vector
 ) : Cloneable, ConfigurationSerializable, Iterable<Block> {
 
@@ -65,7 +65,6 @@ data class Cuboid(
                 }
             }
         }
-
 
 
     val lowerLocation: Location

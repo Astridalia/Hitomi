@@ -32,7 +32,7 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
                 it !in arrayOf(
                     ENCHANTMENT_BOOK_SLOT,
                     ENCHANTMENT_ITEM_SLOT,
-                    ITEM_PROTECTION_SLOT,
+//                    ITEM_PROTECTION_SLOT,
                     CONFIRMATION_ITEM_ENCHANT
                 )
             }
@@ -60,7 +60,7 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
 
         val player = e.player as? Player ?: return
         returnItemToPlayerSlot(itemBook, player, ENCHANTMENT_BOOK_SLOT)
-        returnItemToPlayerSlot(itemProtection, player, ITEM_PROTECTION_SLOT)
+//        returnItemToPlayerSlot(itemProtection, player, ITEM_PROTECTION_SLOT)
         returnItemToPlayerSlot(item, player, ENCHANTMENT_ITEM_SLOT)
     }
 
@@ -82,7 +82,7 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
             val enchantment = HyperionEnchantments.matches(key.key) ?: return@forEach
             if (CustomEnchantments.increaseEnchantmentLevelOrApply(itemToEnchant, enchantmentBook, enchantment)) {
                 e.inventory.setItem(ENCHANTMENT_BOOK_SLOT, null)
-                e.inventory.setItem(ITEM_PROTECTION_SLOT, null)
+//                e.inventory.setItem(ITEM_PROTECTION_SLOT, null)
             }
         }
     }

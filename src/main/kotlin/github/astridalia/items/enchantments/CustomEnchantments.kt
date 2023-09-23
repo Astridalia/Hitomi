@@ -44,13 +44,16 @@ object CustomEnchantments : KoinComponent {
         hyperionEnchantments: HyperionEnchantments
     ): Boolean {
         val itemToEnchant = getFrom(itemStack, hyperionEnchantments)
-        if (!hyperionEnchantments.isRightMaterial(hyperionEnchantments, itemStack.type)) return false
-        if (itemToEnchant <= 0) applyTo(itemStack, hyperionEnchantments = hyperionEnchantments) else {
-            val enchantmentBookLevel = getFrom(enchantmentBook, hyperionEnchantments)
-            if (itemToEnchant == enchantmentBookLevel) {
+        val enchantmentBookLevel = getFrom(enchantmentBook, hyperionEnchantments)
+        when {
+            !hyperionEnchantments.isRightMaterial(hyperionEnchantments, itemStack.type) -> return false
+            itemToEnchant >= hyperionEnchantments.maxLevel -> return false
+            itemToEnchant <= 0 -> applyTo(itemStack, enchantmentBookLevel, hyperionEnchantments)
+            itemToEnchant == enchantmentBookLevel -> {
                 removeFrom(itemStack, hyperionEnchantments, DynamicLore())
                 applyTo(itemStack, itemToEnchant + 1, hyperionEnchantments, DynamicLore())
             }
+            itemToEnchant < enchantmentBookLevel -> return false
         }
         return true
     }

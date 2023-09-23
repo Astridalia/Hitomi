@@ -6,6 +6,7 @@ import github.astridalia.commands.wand.WandCommand
 import github.astridalia.events.TestItemsListener
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
 import github.astridalia.items.enchantments.CustomEnchantments
+import github.astridalia.items.enchantments.events.SimpleAttackEnchantments
 import github.astridalia.items.enchantments.events.CubicMiningBlocks
 import github.astridalia.items.enchantments.events.ExplodingArrow
 import github.astridalia.mobs.MobManager
@@ -29,10 +30,13 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         single { CustomEnchantmentInventory }
         single { ExplodingArrow }
         single { CubicMiningBlocks }
+        single { SimpleAttackEnchantments }
     }
 
+    private val simpleAttackEnchantments: SimpleAttackEnchantments by inject()
     private val explodingArrowEvent: ExplodingArrow by inject()
     private val cubicMiningEvent: CubicMiningBlocks by inject()
+
 
     private val testItemsListener: TestItemsListener by inject()
     private val customEnchantmentInventory: CustomEnchantmentInventory by inject()
@@ -59,6 +63,7 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         pluginManager.registerEvents(explodingArrowEvent, this)
         pluginManager.registerEvents(cubicMiningEvent, this)
         pluginManager.registerEvents(WandCommand, this)
+        pluginManager.registerEvents(simpleAttackEnchantments,this)
     }
 
     override fun onDisable() {

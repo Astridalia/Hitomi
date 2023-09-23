@@ -10,10 +10,17 @@ enum class HyperionEnchantments(val maxLevel: Int, val startingLevel: Int, val a
     HEALING_SPELL(5, 1, emptyList()),
     LIFEDRAIN_SPELL(5, 1, emptyList()),
     GRID_PICKAXE(5, 1, pickaxes),
+    CLOAKING(5, 1, emptyList()),
+    FIERY(5, 1, emptyList()),
+    CHARGED(5, 1, emptyList()),
+    SOULBOUND(5, 1, emptyList()),
     PROJECTILE_MINING(5, 1, pickaxes);
 
-    fun isRightMaterial(hyperionEnchantments: HyperionEnchantments, material: Material): Boolean =
-        hyperionEnchantments.applicableMaterials.contains(material)
+    fun isRightMaterial(hyperionEnchantments: HyperionEnchantments, material: Material): Boolean = when {
+        hyperionEnchantments.applicableMaterials.contains(material) -> true
+        hyperionEnchantments.applicableMaterials.isEmpty() -> true
+        else -> false
+    }
 
     fun displayLevel(hyperionEnchantments: HyperionEnchantments, level: Int = 1): String {
         return "${ChatColor.GRAY}${

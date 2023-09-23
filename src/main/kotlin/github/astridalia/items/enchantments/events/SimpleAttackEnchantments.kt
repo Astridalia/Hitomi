@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -44,6 +45,16 @@ object SimpleAttackEnchantments : Listener, KoinComponent {
         if (e.action in arrayOf(Action.RIGHT_CLICK_AIR, Action.LEFT_CLICK_AIR)) {
             val potionEffect = PotionEffect(PotionEffectType.INVISIBILITY, 255 * from, 255, false, false)
             e.player.addPotionEffect(potionEffect)
+        }
+    }
+
+    @EventHandler
+    fun onPlayerDeathSoulBound(e: PlayerDeathEvent) {
+        e.entity.inventory.forEach {
+            val soulBound = customEnchantments.getFrom(it, HyperionEnchantments.SOULBOUND)
+            if (soulBound <= 0) return@forEach
+            e.drops.remove(it)
+            e.entity.inventory.addItem(it)
         }
     }
 

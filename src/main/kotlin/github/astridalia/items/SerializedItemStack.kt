@@ -29,7 +29,6 @@ data class SerializedItemStack(
     }
 
 
-
     fun toItemStack(amount: Int = 1): ItemStack {
         val material = Material.matchMaterial(type) ?: Material.STONE
         val itemStack = ItemStack(material, amount)

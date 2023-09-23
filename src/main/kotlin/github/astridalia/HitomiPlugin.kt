@@ -2,6 +2,7 @@ package github.astridalia
 
 import co.aikar.commands.PaperCommandManager
 import github.astridalia.commands.HitomiCommands
+import github.astridalia.commands.wand.WandCommand
 import github.astridalia.events.TestItemsListener
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
 import github.astridalia.items.enchantments.CustomEnchantments
@@ -45,6 +46,7 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         commandManager = PaperCommandManager(this)
 
         commandManager.registerCommand(HitomiCommands)
+        commandManager.registerCommand(WandCommand)
 
         startKoin {
             modules(appModule)
@@ -56,7 +58,7 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         pluginManager.registerEvents(customEnchantmentInventory, this)
         pluginManager.registerEvents(explodingArrowEvent, this)
         pluginManager.registerEvents(cubicMiningEvent, this)
-
+        pluginManager.registerEvents(WandCommand, this)
     }
 
     override fun onDisable() {

@@ -28,18 +28,7 @@ data class SerializedItemStack(
         persistentData.remove(name)
     }
 
-    fun toSerialized(itemStack: ItemStack) = SerializedItemStack(
-        type = itemStack.type.name,
-        name = itemStack.itemMeta?.displayName ?: "test_item",
-        lore = itemStack.itemMeta?.lore ?: mutableListOf(),
-        model = itemStack.itemMeta?.customModelData ?: 0,
-        persistentData = itemStack.itemMeta?.persistentDataContainer
-            ?.keys
-            ?.filter { it.key == HitomiPlugin::class.simpleName!!.lowercase(Locale.getDefault()) }
-            ?.associate { it.key to persistentData[it.key].toString() }
-            ?.toMutableMap()
-            ?: persistentData
-    )
+
 
     fun toItemStack(amount: Int = 1): ItemStack {
         val material = Material.matchMaterial(type) ?: Material.STONE
@@ -63,5 +52,19 @@ data class SerializedItemStack(
     }
 }
 
-
+fun ItemStack.toSerialized(): SerializedItemStack {
+    val persistentData = mutableMapOf<String, String>()
+    return SerializedItemStack(
+        type = this.type.name,
+        name = this.itemMeta?.displayName ?: "test_item",
+        lore = this.itemMeta?.lore ?: mutableListOf(),
+        model = this.itemMeta?.customModelData ?: 0,
+        persistentData = this.itemMeta?.persistentDataContainer
+            ?.keys
+            ?.filter { it.key == HitomiPlugin::class.simpleName!!.lowercase(Locale.getDefault()) }
+            ?.associate { it.key to persistentData[it.key].toString() }
+            ?.toMutableMap()
+            ?: persistentData
+    )
+}
 

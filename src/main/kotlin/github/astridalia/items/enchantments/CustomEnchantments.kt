@@ -53,6 +53,7 @@ object CustomEnchantments : KoinComponent {
                 removeFrom(itemStack, hyperionEnchantments, DynamicLore())
                 applyTo(itemStack, itemToEnchant + 1, hyperionEnchantments, DynamicLore())
             }
+
             itemToEnchant < enchantmentBookLevel -> return false
         }
         return true

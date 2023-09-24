@@ -4,6 +4,7 @@ import co.aikar.commands.PaperCommandManager
 import github.astridalia.commands.HitomiCommands
 import github.astridalia.commands.wand.WandCommand
 import github.astridalia.events.TestItemsListener
+import github.astridalia.items.SerializedItemStack
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
 import github.astridalia.items.enchantments.CustomEnchantments
 import github.astridalia.items.enchantments.events.CubicMiningBlocks
@@ -31,6 +32,7 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         single { ExplodingArrow }
         single { CubicMiningBlocks }
         single { SimpleAttackEnchantments }
+        single { SerializedItemStack }
 
     }
 

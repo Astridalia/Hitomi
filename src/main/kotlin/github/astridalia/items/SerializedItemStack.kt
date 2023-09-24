@@ -7,6 +7,9 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.plugin.java.JavaPlugin
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.util.*
 
 
@@ -20,34 +23,23 @@ data class SerializedItemStack(
     val model: Int = 0,
     val persistentData: MutableMap<String, String> = hashMapOf("timestamp" to System.currentTimeMillis().toString()),
     val dynamicLore: DynamicLore = DynamicLore()
-) {
-
-
-    fun addData(name: String, value: String) {
-        persistentData.putIfAbsent(name, value)
+) : KoinComponent {
+    private fun namespaceKey(str: String): NamespacedKey {
+        val javaPlugin: JavaPlugin by inject()
+        return NamespacedKey(javaPlugin, str)
     }
-
-    fun removeData(name: String) {
-        persistentData.remove(name)
-    }
-
 
     fun toItemStack(amount: Int = 1): ItemStack {
         val material = Material.matchMaterial(type) ?: Material.STONE
         val itemStack = ItemStack(material, amount)
-        val itemMeta = itemStack.itemMeta
-        itemMeta?.apply {
-            setDisplayName(name)
-            lore = this@SerializedItemStack.lore
-            setCustomModelData(model)
-            persistentData.forEach { (k, v) ->
-                val namespaceKey = NamespacedKey(
-                    HitomiPlugin::class.simpleName!!.lowercase(Locale.getDefault()),
-                    k
-                )
-                persistentDataContainer.set(namespaceKey, PersistentDataType.STRING, v)
-            }
-            isUnbreakable = true
+        val itemMeta = itemStack.itemMeta ?: return itemStack
+        itemMeta.setDisplayName(name)
+        itemMeta.lore = lore
+        itemMeta.setCustomModelData(model)
+        itemMeta.isUnbreakable = true
+        persistentData.forEach { (k, v) ->
+            val namespaceKey = namespaceKey(k)
+            itemMeta.persistentDataContainer.set(namespaceKey, PersistentDataType.STRING, v)
         }
         itemStack.itemMeta = itemMeta
         return itemStack

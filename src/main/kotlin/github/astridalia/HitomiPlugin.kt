@@ -12,6 +12,8 @@ import github.astridalia.items.enchantments.events.ExplodingArrow
 import github.astridalia.items.enchantments.events.SimpleAttackEnchantments
 import github.astridalia.mobs.MobManager
 import org.bukkit.Bukkit
+import org.bukkit.event.Listener
+import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -23,6 +25,7 @@ import org.koin.dsl.module
 class HitomiPlugin : JavaPlugin(), KoinComponent {
     private val appModule = module {
         single<JavaPlugin> { this@HitomiPlugin }
+        single<Plugin> { this@HitomiPlugin }
         single { TestItemsListener() }
         single { CustomEnchantments }
         single { CustomEnchantmentInventory }
@@ -48,21 +51,30 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
             "org.litote.kmongo.jackson.JacksonClassMappingTypeService"
         )
 
-        paperCommandManager.registerCommand(HitomiCommands)
-        paperCommandManager.registerCommand(WandCommand)
-
         startKoin {
             modules(appModule)
         }
 
-        val pluginManager = server.pluginManager
-        pluginManager.registerEvents(testItemsListener, this)
-        pluginManager.registerEvents(customEnchantmentInventory, this)
-        pluginManager.registerEvents(explodingArrowEvent, this)
-        pluginManager.registerEvents(cubicMiningEvent, this)
-        pluginManager.registerEvents(WandCommand, this)
-        pluginManager.registerEvents(simpleAttackEnchantments, this)
+        paperCommandManager.registerCommand(HitomiCommands)
+        paperCommandManager.registerCommand(WandCommand)
+
+        registerEventListeners(
+            testItemsListener,
+            customEnchantmentInventory,
+            explodingArrowEvent,
+            cubicMiningEvent,
+            WandCommand,
+            simpleAttackEnchantments
+        )
     }
+
+    private fun registerEventListeners(vararg listeners: Listener) {
+        val pluginManager = server.pluginManager
+        listeners.forEach { listener ->
+            pluginManager.registerEvents(listener, this)
+        }
+    }
+
 
     override fun onDisable() {
         MobManager.cleanUp()

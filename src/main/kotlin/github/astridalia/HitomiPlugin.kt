@@ -21,9 +21,6 @@ import org.koin.dsl.module
 
 
 class HitomiPlugin : JavaPlugin(), KoinComponent {
-
-    private lateinit var commandManager: PaperCommandManager
-
     private val appModule = module {
         single<JavaPlugin> { this@HitomiPlugin }
         single { TestItemsListener() }
@@ -33,9 +30,10 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         single { CubicMiningBlocks }
         single { SimpleAttackEnchantments }
         single { SerializedItemStack }
-
+        single { PaperCommandManager(get()) }
     }
 
+    private val paperCommandManager: PaperCommandManager by inject()
     private val simpleAttackEnchantments: SimpleAttackEnchantments by inject()
     private val explodingArrowEvent: ExplodingArrow by inject()
     private val cubicMiningEvent: CubicMiningBlocks by inject()
@@ -50,17 +48,14 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
             "org.litote.kmongo.jackson.JacksonClassMappingTypeService"
         )
 
-        commandManager = PaperCommandManager(this)
-
-        commandManager.registerCommand(HitomiCommands)
-        commandManager.registerCommand(WandCommand)
+        paperCommandManager.registerCommand(HitomiCommands)
+        paperCommandManager.registerCommand(WandCommand)
 
         startKoin {
             modules(appModule)
         }
 
-        val pluginManager = Bukkit.getPluginManager()
-
+        val pluginManager = server.pluginManager
         pluginManager.registerEvents(testItemsListener, this)
         pluginManager.registerEvents(customEnchantmentInventory, this)
         pluginManager.registerEvents(explodingArrowEvent, this)

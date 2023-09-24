@@ -41,7 +41,6 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
     private val explodingArrowEvent: ExplodingArrow by inject()
     private val cubicMiningEvent: CubicMiningBlocks by inject()
 
-
     private val testItemsListener: TestItemsListener by inject()
     private val customEnchantmentInventory: CustomEnchantmentInventory by inject()
 

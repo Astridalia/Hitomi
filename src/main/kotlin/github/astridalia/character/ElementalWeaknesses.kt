@@ -19,7 +19,6 @@ data class ElementalWeaknesses(
             CustomAttributeType.SpiritElement -> spiritWeakness
             CustomAttributeType.TempestElement -> tempestWeakness
             CustomAttributeType.CombustionElement -> combustionWeakness
-            else -> 0.0 // Default to no weakness
         }
     }
 }

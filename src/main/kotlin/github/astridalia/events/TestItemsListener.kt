@@ -6,6 +6,7 @@ import github.astridalia.items.enchantments.CustomEnchantments
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -13,6 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.litote.kmongo.id.StringId
+import java.util.*
 
 class TestItemsListener : Listener, KoinComponent {
 
@@ -126,7 +128,6 @@ class TestItemsListener : Listener, KoinComponent {
 
     @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private fun getProfileForEntity(entity: Entity): Profile? {
-
         val testStats = CachedMongoDBStorage(Profile::class.java, "players")
         val entityIdString = StringId<Profile>(entity.uniqueId.toString())
         return testStats.get(entityIdString)
@@ -148,14 +149,16 @@ class TestItemsListener : Listener, KoinComponent {
     @EventHandler
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
-        val testStats = CachedMongoDBStorage(Profile::class.java, "players")
-        val playerIdString = StringId<Profile>(player.uniqueId.toString())
-        val stats = testStats.get(playerIdString) ?: run {
-            val itemEntity = Profile(player.uniqueId.toString(), CharacterStats())
-            testStats.insertOrUpdate(playerIdString, itemEntity)
-            itemEntity
-        }
-        println(stats)
-    }
 
+        // Ensure this event handler is only executed once per player join
+
+            val testStats = CachedMongoDBStorage(Profile::class.java, "players")
+            val playerIdString = StringId<Profile>(player.uniqueId.toString())
+            val stats = testStats.get(playerIdString) ?: run {
+                val itemEntity = Profile(player.uniqueId.toString(), CharacterStats())
+                testStats.insertOrUpdate(playerIdString, itemEntity)
+                itemEntity
+            }
+            println(stats)
+        }
 }

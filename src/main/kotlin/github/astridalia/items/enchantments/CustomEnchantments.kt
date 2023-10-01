@@ -15,7 +15,6 @@ import org.bukkit.persistence.PersistentDataType.INTEGER
 import org.litote.kmongo.id.StringId
 import java.util.*
 
-// TODO: Lore doesn't work properly still?
 fun String.translateColors(): String = ChatColor.translateAlternateColorCodes('&', this)
 
 @Serializable

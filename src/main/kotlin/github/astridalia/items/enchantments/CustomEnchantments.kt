@@ -1,6 +1,8 @@
 package github.astridalia.items.enchantments
 
 import github.astridalia.items.DynamicLore
+import github.astridalia.items.enchantments.v2.CustomEnchant
+import github.astridalia.items.enchantments.v2.enchantOf
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
@@ -32,19 +34,22 @@ object CustomEnchantments : KoinComponent {
         itemStack.itemMeta = itemMeta
     }
 
+
+    // TODO: upgrading enchants, don't work right, and lore too?
     fun increaseEnchantmentLevelOrApply(
         itemStack: ItemStack,
         enchantmentBook: ItemStack,
         hyperionEnchantments: HyperionEnchantments
     ): Boolean {
-        val itemLevel = getFrom(itemStack, hyperionEnchantments)
-        val bookLevel = getFrom(enchantmentBook, hyperionEnchantments)
-        if (!canEnchant(itemStack, hyperionEnchantments, bookLevel)) return false
-        if (itemLevel == bookLevel)
-            applyTo(itemStack, itemLevel + 1, hyperionEnchantments) else applyTo(
-            itemStack,
-            hyperionEnchantments = hyperionEnchantments
-        )
+//        val itemLevel = getFrom(itemStack, hyperionEnchantments)
+//        val bookLevel = getFrom(enchantmentBook, hyperionEnchantments)
+//        if (!canEnchant(itemStack, hyperionEnchantments, bookLevel)) return false
+//        if (itemLevel == bookLevel)
+//            applyTo(itemStack, itemLevel + 1, hyperionEnchantments) else applyTo(
+//            itemStack,
+//            hyperionEnchantments = hyperionEnchantments
+//        )
+        itemStack.enchantOf(CustomEnchant(name = "Fiery"))
         return true
     }
 

@@ -2,7 +2,6 @@ package github.astridalia.events
 
 import github.astridalia.character.*
 import github.astridalia.database.CachedMongoDBStorage
-import github.astridalia.items.enchantments.CustomEnchantments
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.bukkit.entity.Entity
@@ -11,12 +10,10 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.litote.kmongo.id.StringId
 
 class TestItemsListener : Listener, KoinComponent {
 
-    private val customEnchantments: CustomEnchantments by inject()
 
 
     fun getLevelMultiplier(attackerLevel: Int, defenderLevel: Int): Double {

@@ -6,9 +6,7 @@ import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Subcommand
 import github.astridalia.database.CachedMongoDBStorage
 import github.astridalia.items.SerializedItemStack
-import github.astridalia.items.enchantments.CustomEnchantmentInventory
-import github.astridalia.items.enchantments.CustomEnchantments
-import github.astridalia.items.enchantments.HyperionEnchantments
+import github.astridalia.items.enchantments.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -29,13 +27,20 @@ object HitomiCommands : BaseCommand() {
     @Subcommand("enchant")
     @CommandPermission("hitomi.enchanting.summon")
     fun summonEnchant(id: String, level: Int, player: Player) {
-        val hyperionEnchantments = HyperionEnchantments.matches(id) ?: return
-        val itemStack = ItemStack(Material.ENCHANTED_BOOK, 1)
-        CustomEnchantments.applyTo(itemStack, level, hyperionEnchantments)
-        val remainingItems = player.inventory.addItem(itemStack)
-        if (remainingItems.isNotEmpty()) {
-            player.sendMessage("Your inventory is full. Some items could not be added.")
-        } else player.sendMessage("You have received the item.")
+        val matches = CustomEnchant.matches(id)
+        if (matches == null) {
+            player.sendMessage("Enchantment doesn't exist!")
+        } else {
+            val itemStack = ItemStack(Material.ENCHANTED_BOOK, 1)
+            itemStack.enchantOf(matches)
+
+
+            val remainingItems = player.inventory.addItem(itemStack)
+            if (remainingItems.isNotEmpty()) {
+                player.sendMessage("Your inventory is full. Some items could not be added.")
+            } else player.sendMessage("You have received the item.")
+
+        }
     }
 
     @CommandAlias("item")

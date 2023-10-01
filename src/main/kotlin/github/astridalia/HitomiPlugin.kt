@@ -6,12 +6,10 @@ import github.astridalia.commands.wand.WandCommand
 import github.astridalia.events.TestItemsListener
 import github.astridalia.items.SerializedItemStack
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
-import github.astridalia.items.enchantments.CustomEnchantments
 import github.astridalia.items.enchantments.events.CubicMiningBlocks
 import github.astridalia.items.enchantments.events.ExplodingArrow
 import github.astridalia.items.enchantments.events.SimpleAttackEnchantments
 import github.astridalia.mobs.MobManager
-import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
@@ -27,7 +25,6 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         single<JavaPlugin> { this@HitomiPlugin }
         single<Plugin> { this@HitomiPlugin }
         single { TestItemsListener() }
-        single { CustomEnchantments }
         single { CustomEnchantmentInventory }
         single { ExplodingArrow }
         single { CubicMiningBlocks }

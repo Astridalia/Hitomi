@@ -76,10 +76,10 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
         val itemToEnchant = inventory.getItem(ENCHANTMENT_ITEM_SLOT) ?: return
         if (e.rawSlot != CONFIRMATION_ITEM_ENCHANT || enchantmentBook == null) return
         enchantmentBook.itemMeta?.persistentDataContainer?.keys?.forEach { key ->
-            val enchantment = HyperionEnchantments.matches(key.key) ?: return@forEach
-            if (CustomEnchantments.increaseEnchantmentLevelOrApply(itemToEnchant, enchantmentBook, enchantment)) {
-                e.inventory.setItem(ENCHANTMENT_BOOK_SLOT, null)
-            }
+            val enchantment = CustomEnchant.matches(key.key) ?: return@forEach
+            if (!itemToEnchant.canEnchant(enchantment)) return@forEach
+            itemToEnchant.enchantOf(enchantment)
+            e.inventory.setItem(ENCHANTMENT_BOOK_SLOT, null)
         }
     }
 }

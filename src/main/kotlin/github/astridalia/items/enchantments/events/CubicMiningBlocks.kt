@@ -1,8 +1,7 @@
 package github.astridalia.items.enchantments.events
 
-import github.astridalia.items.enchantments.CustomEnchantments
-import github.astridalia.items.enchantments.HyperionEnchantments
-import kotlinx.coroutines.*
+import github.astridalia.items.enchantments.CustomEnchant
+import github.astridalia.items.enchantments.getEnchantOf
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.block.Block
@@ -10,13 +9,10 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.scheduler.BukkitRunnable
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 object CubicMiningBlocks : KoinComponent, Listener {
-    private val customEnchantments: CustomEnchantments by inject()
+    private val customEnchant = CustomEnchant(name = "CubicMining")
 
     private val unbreakableMaterials = setOf(
         Material.BEDROCK, Material.BARRIER, Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK,
@@ -30,7 +26,7 @@ object CubicMiningBlocks : KoinComponent, Listener {
 
         // Check if the player has the Cubic Mining enchantment
         val itemInMainHand = player.inventory.itemInMainHand
-        val cubicMiningLevel = customEnchantments.getFrom(itemInMainHand, HyperionEnchantments.GRID_PICKAXE)
+        val cubicMiningLevel = itemInMainHand.getEnchantOf(customEnchant) ?: 0
         if (cubicMiningLevel <= 0) return
 
         val cubeBlocks = getCubicBlocks(block)

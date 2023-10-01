@@ -38,10 +38,9 @@ fun ItemStack.enchantOf(customEnchant: CustomEnchant): Int {
     val dataContainer = itemMeta.persistentDataContainer
     val persistentData = PersistentData(dataContainer, INTEGER)
     val enchantName = customEnchant.name
-    val loreToAdd = "${ChatColor.DARK_PURPLE}$enchantName ${ChatColor.AQUA}${customEnchant.level.toRoman()}"
-    val existingLevel = persistentData[enchantName]
-
-    if (existingLevel == null || existingLevel < customEnchant.level) {
+    val existingLevel = persistentData[enchantName] ?: 0
+    val loreToAdd = "${ChatColor.DARK_PURPLE}$enchantName ${ChatColor.AQUA}${existingLevel.toRoman()}"
+    if (existingLevel <= 0) {
         with(itemMeta) {
             lore?.removeIf { it.startsWith("${ChatColor.DARK_PURPLE}$enchantName ") }
             addEnchant(Enchantment.DURABILITY, 1, true)
@@ -50,18 +49,18 @@ fun ItemStack.enchantOf(customEnchant: CustomEnchant): Int {
         }
         persistentData[enchantName] = customEnchant.level
         this.itemMeta = itemMeta
-    } else if (existingLevel == customEnchant.level) {
-        // Increment level when equal
+
+    } else if (existingLevel >= customEnchant.level) {
         with(itemMeta) {
-            persistentData[enchantName] = customEnchant.level + 1
+            val current = existingLevel + customEnchant.level
+            persistentData[enchantName] = current
             lore = lore?.map {
                 if (it.startsWith("${ChatColor.DARK_PURPLE}$enchantName "))
-                    "${ChatColor.DARK_PURPLE}$enchantName ${ChatColor.AQUA}${(customEnchant.level + 1).toRoman()}" else it
+                    "${ChatColor.DARK_PURPLE}$enchantName ${ChatColor.AQUA}${current.toRoman()}" else it
             }?.toMutableList() ?: mutableListOf()
         }
         this.itemMeta = itemMeta
     }
-
     return getEnchantOf(customEnchant) ?: getOrDefault(customEnchant).level
 }
 

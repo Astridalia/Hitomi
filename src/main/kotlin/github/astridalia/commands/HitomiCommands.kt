@@ -6,7 +6,9 @@ import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Subcommand
 import github.astridalia.database.CachedMongoDBStorage
 import github.astridalia.items.SerializedItemStack
-import github.astridalia.items.enchantments.*
+import github.astridalia.items.enchantments.CustomEnchant
+import github.astridalia.items.enchantments.CustomEnchantmentInventory
+import github.astridalia.items.enchantments.enchantOf
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -33,8 +35,6 @@ object HitomiCommands : BaseCommand() {
         } else {
             val itemStack = ItemStack(Material.ENCHANTED_BOOK, 1)
             itemStack.enchantOf(matches)
-
-
             val remainingItems = player.inventory.addItem(itemStack)
             if (remainingItems.isNotEmpty()) {
                 player.sendMessage("Your inventory is full. Some items could not be added.")
@@ -79,8 +79,6 @@ object HitomiCommands : BaseCommand() {
         }
         player.sendMessage(message)
     }
-
-
 
 
 }

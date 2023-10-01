@@ -15,8 +15,6 @@ import org.bukkit.persistence.PersistentDataType.INTEGER
 import org.litote.kmongo.id.StringId
 import java.util.*
 
-fun String.translateColors(): String = ChatColor.translateAlternateColorCodes('&', this)
-
 @Serializable
 data class CustomEnchant(
     var level: Int = 1,

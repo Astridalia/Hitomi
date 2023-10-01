@@ -15,7 +15,6 @@ import org.litote.kmongo.id.StringId
 class TestItemsListener : Listener, KoinComponent {
 
 
-
     fun getLevelMultiplier(attackerLevel: Int, defenderLevel: Int): Double {
         val levelDifference = attackerLevel - defenderLevel
 

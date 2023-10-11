@@ -28,13 +28,9 @@ class RedisCache<T : Any>(
 
     override fun get(id: Id<T>): T? {
         val cachedData = getCache(id.toHash())
-        if (cachedData != null) {
-            return cachedData
-        }
+        if (cachedData != null) return cachedData
         val dataFromDB = super.get(id)
-        if (dataFromDB != null) {
-            setCache(id.toHash(), dataFromDB)
-        }
+        if (dataFromDB != null) setCache(id.toHash(), dataFromDB)
         return dataFromDB
     }
 
@@ -43,36 +39,30 @@ class RedisCache<T : Any>(
         removeCache(id.toHash())
     }
 
-    private fun getCache(id: Id<T>): T? {
-        jedisPool.resource.use { jedis ->
-            val cachedData = jedis.get(id.toHash().id)
-            return if (cachedData != null) {
-                deserialize(cachedData, clazz) // Pass clazz parameter here
-            } else {
-                null
-            }
-        }
+    private fun getCache(id: Id<T>): T? = jedisPool.resource.use {
+        val cachedData = it.get(id.toHash().id)
+        return if (cachedData != null) {
+            deserialize(cachedData, clazz) // Pass clazz parameter here
+        } else null
     }
 
     private fun setCache(id: Id<T>, entity: T) {
-        jedisPool.resource.use { jedis ->
-            jedis.setex(id.toString(), (cacheExpirationMinutes * 60).toInt(), serialize(entity))
+        jedisPool.resource.use {
+            it.setex(
+                id.toString(),
+                (cacheExpirationMinutes * 60).toInt(),
+                serialize(entity)
+            )
         }
     }
 
     private fun removeCache(id: Id<T>) {
-        jedisPool.resource.use { jedis ->
-            jedis.del(id.toString())
-        }
+        jedisPool.resource.use { it.del(id.toString()) }
     }
 
-    private fun serialize(entity: T): String {
-        return objectMapper.writeValueAsString(entity)
-    }
+    private fun serialize(entity: T): String = objectMapper.writeValueAsString(entity)
 
-    private fun deserialize(data: String, clazz: Class<T>): T? {
-        return objectMapper.readValue(data, clazz)
-    }
+    private fun deserialize(data: String, clazz: Class<T>): T? = objectMapper.readValue(data, clazz)
 
 
 }

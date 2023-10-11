@@ -33,6 +33,8 @@ dependencies {
     implementation("com.mineinabyss:idofront-serializers:0.18.24")
     implementation("org.json:json:20230618")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
+    implementation("redis.clients:jedis:3.8.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.5")
 }
 
 java {

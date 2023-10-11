@@ -1,6 +1,6 @@
 package github.astridalia.modules.models
 
-import github.astridalia.database.CachedMongoDBStorage
+import github.astridalia.database.RedisCache
 import github.astridalia.items.SerializedItemStack
 import github.astridalia.items.toSerialized
 import kotlinx.serialization.Serializable
@@ -19,14 +19,14 @@ data class InventorySurrogate(
     val name: String = "test",
     var items: ArrayList<SerializedItemStack> = arrayListOf()
 ) {
-    fun toInventory(): Inventory {
+    private fun toInventory(): Inventory {
         val inventory = Bukkit.createInventory(null, type, name)
         inventory.contents = items.map { it.toItemStack() }.toList().toTypedArray()
         return inventory
     }
 
     fun storeToDatabase(inventory: Inventory, name: String): Inventory {
-        val cachedMongoDBStorage = CachedMongoDBStorage(InventorySurrogate::class.java, "inventories")
+        val cachedMongoDBStorage = RedisCache(InventorySurrogate::class.java, "inventories")
         val stringId = StringId<InventorySurrogate>("test")
         val invSurrogate = cachedMongoDBStorage.get(stringId)
 

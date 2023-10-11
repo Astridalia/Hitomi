@@ -4,7 +4,7 @@ import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Subcommand
-import github.astridalia.database.CachedMongoDBStorage
+import github.astridalia.database.RedisCache
 import github.astridalia.items.SerializedItemStack
 import github.astridalia.items.enchantments.CustomEnchant
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
@@ -46,7 +46,7 @@ object HitomiCommands : BaseCommand() {
     @CommandAlias("item")
     @CommandPermission("hitomi.item")
     fun give(id: String, player: Player) {
-        val cachedMongoDBStorage = CachedMongoDBStorage(SerializedItemStack::class.java, "itemStacks")
+        val cachedMongoDBStorage = RedisCache(SerializedItemStack::class.java, "itemStacks")
         val stringId = StringId<SerializedItemStack>(id)
         val itemStack = cachedMongoDBStorage.get(stringId)
         if (itemStack == null) {

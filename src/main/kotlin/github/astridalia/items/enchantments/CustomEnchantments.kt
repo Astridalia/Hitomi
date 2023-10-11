@@ -1,6 +1,6 @@
 package github.astridalia.items.enchantments
 
-import github.astridalia.database.CachedMongoDBStorage
+import github.astridalia.database.RedisCache
 import github.astridalia.inventory.toRoman
 import github.astridalia.items.PersistentData
 import kotlinx.serialization.SerialName
@@ -27,7 +27,7 @@ data class CustomEnchant(
 
         fun matches(name: String): CustomEnchant? {
             val formattedName = enchantmentNameRegex.replace(name.lowercase(Locale.getDefault()), "")
-            val cachedMongoDBStorage = CachedMongoDBStorage(CustomEnchant::class.java, "enchants")
+            val cachedMongoDBStorage = RedisCache(CustomEnchant::class.java, "enchants")
             return cachedMongoDBStorage.get(StringId(formattedName))
         }
     }
@@ -67,7 +67,7 @@ fun ItemStack.enchantOf(customEnchant: CustomEnchant): Int {
 fun ItemStack.canEnchant(customEnchant: CustomEnchant): Boolean = customEnchant.applicableMaterials.contains(type)
 
 fun ItemStack.getOrDefault(customEnchant: CustomEnchant): CustomEnchant {
-    val cachedMongoDBStorage = CachedMongoDBStorage(CustomEnchant::class.java, "enchants")
+    val cachedMongoDBStorage = RedisCache(CustomEnchant::class.java, "enchants")
     return cachedMongoDBStorage.get(StringId(customEnchant.name)) ?: run {
         cachedMongoDBStorage.insertOrUpdate(StringId(customEnchant.name), customEnchant)
         customEnchant

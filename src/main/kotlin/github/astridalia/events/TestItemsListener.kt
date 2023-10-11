@@ -1,9 +1,7 @@
 package github.astridalia.events
 
 import github.astridalia.character.*
-import github.astridalia.database.CachedMongoDBStorage
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import github.astridalia.database.RedisCache
 import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -120,9 +118,8 @@ class TestItemsListener : Listener, KoinComponent {
         e.damage = calculateDamage(attackerStats, defenderStats)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private fun getProfileForEntity(entity: Entity): Profile? {
-        val testStats = CachedMongoDBStorage(Profile::class.java, "players")
+        val testStats = RedisCache(Profile::class.java, "players")
         val entityIdString = StringId<Profile>(entity.uniqueId.toString())
         return testStats.get(entityIdString)
     }
@@ -147,7 +144,7 @@ class TestItemsListener : Listener, KoinComponent {
         // Ensure this event handler is only executed once per player join
 
 
-        val testStats = CachedMongoDBStorage(Profile::class.java, "players")
+        val testStats = RedisCache(Profile::class.java, "players")
         val playerIdString = StringId<Profile>(player.uniqueId.toString())
         val stats = testStats.get(playerIdString) ?: run {
             val itemEntity = Profile(player.uniqueId.toString(), CharacterStats())

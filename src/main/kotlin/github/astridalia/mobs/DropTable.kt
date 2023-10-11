@@ -1,6 +1,6 @@
 package github.astridalia.mobs
 
-import github.astridalia.database.CachedMongoDBStorage
+import github.astridalia.database.RedisCache
 import github.astridalia.items.SerializedItemStack
 import kotlinx.serialization.Serializable
 import org.litote.kmongo.id.StringId
@@ -27,7 +27,7 @@ data class DropTable(val drops: MutableMap<Int, Double> = mutableMapOf()) {
     }
 
     fun roll(): SerializedItemStack? {
-        val cachedMongoDBStorage = CachedMongoDBStorage(SerializedItemStack::class.java, "itemStacks")
+        val cachedMongoDBStorage = RedisCache(SerializedItemStack::class.java, "itemStacks")
         val randomValue = Random.nextDouble(0.0, 1.0)
         for ((id, cumulativeChance) in cumulativeChances) {
             if (randomValue <= cumulativeChance) {

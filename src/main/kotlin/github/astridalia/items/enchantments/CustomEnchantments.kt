@@ -21,8 +21,7 @@ data class CustomEnchant(
     var _id: String = "fiery",
     var applicableMaterials: MutableList<Material> = mutableListOf(),
     var level: Int = 1,
-    var maxLevel: Int = 5,
-    var format: String = "%enchant %level"
+    var maxLevel: Int = 5
 ) {
 
     companion object {
@@ -34,7 +33,6 @@ data class CustomEnchant(
         }
     }
 }
-
 
 fun ItemStack.enchantOf(customEnchant: CustomEnchant): Int {
     val itemMeta = itemMeta ?: return 0
@@ -55,7 +53,10 @@ fun ItemStack.enchantOf(customEnchant: CustomEnchant): Int {
     return getEnchantOf(customEnchant) ?: getOrDefault(customEnchant).level
 }
 
-fun ItemStack.canEnchant(customEnchant: CustomEnchant): Boolean = customEnchant.applicableMaterials.contains(type)
+fun ItemStack.canEnchant(customEnchant: CustomEnchant): Boolean {
+    val contains = customEnchant.applicableMaterials.contains(type)
+    return !(!contains && customEnchant.level == customEnchant.maxLevel)
+}
 
 fun ItemStack.getOrDefault(customEnchant: CustomEnchant): CustomEnchant {
     return RedisCache(CustomEnchant::class.java).get(StringId(customEnchant._id)) ?: run {

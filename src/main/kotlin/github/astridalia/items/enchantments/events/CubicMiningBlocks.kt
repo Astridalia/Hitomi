@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.koin.core.component.KoinComponent
 
 object CubicMiningBlocks : KoinComponent, Listener {
-    private val customEnchant = CustomEnchant("CubicMining")
+    private val customEnchant = CustomEnchant("ExplodingMine")
 
     private val unbreakableMaterials = setOf(
         Material.BEDROCK, Material.BARRIER, Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK,

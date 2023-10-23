@@ -72,14 +72,14 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
                 ENCHANTMENT_ITEM_SLOT
             )
         ) e.isCancelled = true
-        val enchantmentBook = inventory.getItem(ENCHANTMENT_BOOK_SLOT)
+        val enchantmentBook = inventory.getItem(ENCHANTMENT_BOOK_SLOT) ?: return
         val itemToEnchant = inventory.getItem(ENCHANTMENT_ITEM_SLOT) ?: return
-        if (e.rawSlot != CONFIRMATION_ITEM_ENCHANT || enchantmentBook == null) return
-        enchantmentBook.itemMeta?.persistentDataContainer?.keys?.forEach { key ->
-            val enchantment = CustomEnchant.matches(key.key) ?: return@forEach
-            if (!itemToEnchant.canEnchant(enchantment)) return@forEach
-            itemToEnchant.enchantOf(enchantment)
-            e.inventory.setItem(ENCHANTMENT_BOOK_SLOT, null)
-        }
+        if (e.rawSlot != CONFIRMATION_ITEM_ENCHANT) return
+        val bookPersistentData = enchantmentBook.itemMeta?.persistentDataContainer ?: return
+        val enchantmentKey =
+            bookPersistentData.keys.firstNotNullOfOrNull { key -> CustomEnchant.matches(key.key) } ?: return
+        if (!itemToEnchant.canEnchant(enchantmentKey)) return
+        inventory.setItem(ENCHANTMENT_BOOK_SLOT, null)
+        itemToEnchant.enchantOf(enchantmentKey)
     }
 }

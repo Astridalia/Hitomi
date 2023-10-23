@@ -1,20 +1,19 @@
 package github.astridalia.database
 
-
-import com.mongodb.client.MongoCollection
-import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.UpdateOptions
 import org.litote.kmongo.Id
 import org.litote.kmongo.deleteOneById
 import org.litote.kmongo.findOneById
 import org.litote.kmongo.updateOneById
+import java.util.*
 
-open class MongoDBStorage<T : Any>(clazz: Class<T>, collectName: String) : Storage<T> {
-    private val collection: MongoCollection<T> by lazy {
-        val mongodbClient = MongoManager.mongodbClient
-        val database: MongoDatabase = mongodbClient.getDatabase("Hitomi")
-        database.getCollection(collectName, clazz)
+open class MongoDBStorage<T : Any>(private val clazz: Class<T>) : Storage<T> {
+    private val collection by lazy {
+        val database = MongoManager.mongodbClient.getDatabase("Hitomi")
+        database.getCollection(collectionName, clazz)
     }
+
+    protected val collectionName: String = clazz.simpleName.lowercase(Locale.getDefault())
 
     override fun insertOrUpdate(id: Id<T>, entity: T) {
         collection.updateOneById(id, entity, UpdateOptions().upsert(true))

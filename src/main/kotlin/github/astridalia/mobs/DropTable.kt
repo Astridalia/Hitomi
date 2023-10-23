@@ -27,7 +27,7 @@ data class DropTable(val drops: MutableMap<Int, Double> = mutableMapOf()) {
     }
 
     fun roll(): SerializedItemStack? {
-        val cachedMongoDBStorage = RedisCache(SerializedItemStack::class.java, "itemStacks")
+        val cachedMongoDBStorage = RedisCache(SerializedItemStack::class.java)
         val randomValue = Random.nextDouble(0.0, 1.0)
         for ((id, cumulativeChance) in cumulativeChances) {
             if (randomValue <= cumulativeChance) {

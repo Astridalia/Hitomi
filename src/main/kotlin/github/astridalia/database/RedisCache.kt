@@ -9,9 +9,8 @@ import redis.clients.jedis.JedisPoolConfig
 
 class RedisCache<T : Any>(
     private val clazz: Class<T>,
-    private val collectName: String,
     private val cacheExpirationMinutes: Long = 30,
-) : Storage<T>, MongoDBStorage<T>(clazz, collectName) {
+) : Storage<T>, MongoDBStorage<T>(clazz) {
 
     private val jedisPool = JedisPool(JedisPoolConfig(), "localhost")
     private val objectMapper = jacksonObjectMapper()
@@ -21,17 +20,8 @@ class RedisCache<T : Any>(
         setCache(id.toHash(), entity)
     }
 
-    private fun Id<T>.toHash(): StringId<T> {
-        val hashing = Hashing.sha256().hashString("$this:$collectName", Charsets.UTF_8)
-        return StringId(hashing.toString())
-    }
-
     override fun get(id: Id<T>): T? {
-        val cachedData = getCache(id.toHash())
-        if (cachedData != null) return cachedData
-        val dataFromDB = super.get(id)
-        if (dataFromDB != null) setCache(id.toHash(), dataFromDB)
-        return dataFromDB
+        return getCache(id.toHash()) ?: super.get(id)?.also { setCache(id.toHash(), it) }
     }
 
     override fun remove(id: Id<T>) {
@@ -39,20 +29,18 @@ class RedisCache<T : Any>(
         removeCache(id.toHash())
     }
 
+    private fun Id<T>.toHash(): StringId<T> {
+        val hashing = Hashing.sha256().hashString("$this:$collectionName", Charsets.UTF_8)
+        return StringId(hashing.toString())
+    }
+
     private fun getCache(id: Id<T>): T? = jedisPool.resource.use {
-        val cachedData = it.get(id.toHash().id)
-        return if (cachedData != null) {
-            deserialize(cachedData, clazz) // Pass clazz parameter here
-        } else null
+        it.get(id.toHash().id)?.let { deserialize(it, clazz) }
     }
 
     private fun setCache(id: Id<T>, entity: T) {
         jedisPool.resource.use {
-            it.setex(
-                id.toString(),
-                (cacheExpirationMinutes * 60).toInt(),
-                serialize(entity)
-            )
+            it.setex(id.toString(), (cacheExpirationMinutes * 60).toInt(), serialize(entity))
         }
     }
 
@@ -63,6 +51,4 @@ class RedisCache<T : Any>(
     private fun serialize(entity: T): String = objectMapper.writeValueAsString(entity)
 
     private fun deserialize(data: String, clazz: Class<T>): T? = objectMapper.readValue(data, clazz)
-
-
 }

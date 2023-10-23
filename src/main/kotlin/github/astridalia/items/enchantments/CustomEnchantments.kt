@@ -17,59 +17,49 @@ import java.util.*
 
 @Serializable
 data class CustomEnchant(
-    var level: Int = 1,
     @BsonId @SerialName("_id")
-    val name: String,
-    val applicableMaterials: List<Material> = emptyList()
+    var _id: String = "fiery",
+    var applicableMaterials: MutableList<Material> = mutableListOf(),
+    var level: Int = 1,
+    var maxLevel: Int = 5,
+    var format: String = "%enchant %level"
 ) {
+
     companion object {
         private val enchantmentNameRegex = Regex("^hitomiplugin:", RegexOption.IGNORE_CASE)
 
         fun matches(name: String): CustomEnchant? {
             val formattedName = enchantmentNameRegex.replace(name.lowercase(Locale.getDefault()), "")
-            val cachedMongoDBStorage = RedisCache(CustomEnchant::class.java, "enchants")
-            return cachedMongoDBStorage.get(StringId(formattedName))
+            return RedisCache(CustomEnchant::class.java).get(StringId(formattedName))
         }
     }
 }
+
 
 fun ItemStack.enchantOf(customEnchant: CustomEnchant): Int {
     val itemMeta = itemMeta ?: return 0
     val dataContainer = itemMeta.persistentDataContainer
     val persistentData = PersistentData(dataContainer, INTEGER)
-    val enchantName = customEnchant.name
-    val existingLevel = persistentData[enchantName] ?: 0
-    val loreToAdd = "${ChatColor.DARK_PURPLE}$enchantName ${ChatColor.AQUA}${existingLevel.toRoman()}"
-    if (existingLevel <= 0) {
-        with(itemMeta) {
-            lore?.removeIf { it.startsWith("${ChatColor.DARK_PURPLE}$enchantName ") }
-            addEnchant(Enchantment.DURABILITY, 1, true)
-            addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE)
-            lore = (lore ?: mutableListOf()) + loreToAdd
-        }
-        persistentData[enchantName] = customEnchant.level
-        this.itemMeta = itemMeta
+    val data = persistentData[customEnchant._id] ?: 0
 
-    } else if (existingLevel >= customEnchant.level) {
-        with(itemMeta) {
-            val current = existingLevel + customEnchant.level
-            persistentData[enchantName] = current
-            lore = lore?.map {
-                if (it.startsWith("${ChatColor.DARK_PURPLE}$enchantName "))
-                    "${ChatColor.DARK_PURPLE}$enchantName ${ChatColor.AQUA}${current.toRoman()}" else it
-            }?.toMutableList() ?: mutableListOf()
-        }
-        this.itemMeta = itemMeta
-    }
+    itemMeta.addEnchant(Enchantment.DURABILITY, 1, true)
+    itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+
+    val newLevel = data + customEnchant.level
+    persistentData[customEnchant._id] = newLevel
+    val loreToAdd = "${ChatColor.DARK_AQUA}${customEnchant._id} ${ChatColor.BLUE}${newLevel.toRoman()}"
+    val loreToRemove = "${ChatColor.DARK_AQUA}${customEnchant._id} ${ChatColor.BLUE}${data.toRoman()}"
+    itemMeta.lore = (itemMeta.lore ?: mutableListOf()) - loreToRemove + loreToAdd
+
+    this.setItemMeta(itemMeta)
     return getEnchantOf(customEnchant) ?: getOrDefault(customEnchant).level
 }
 
 fun ItemStack.canEnchant(customEnchant: CustomEnchant): Boolean = customEnchant.applicableMaterials.contains(type)
 
 fun ItemStack.getOrDefault(customEnchant: CustomEnchant): CustomEnchant {
-    val cachedMongoDBStorage = RedisCache(CustomEnchant::class.java, "enchants")
-    return cachedMongoDBStorage.get(StringId(customEnchant.name)) ?: run {
-        cachedMongoDBStorage.insertOrUpdate(StringId(customEnchant.name), customEnchant)
+    return RedisCache(CustomEnchant::class.java).get(StringId(customEnchant._id)) ?: run {
+        RedisCache(CustomEnchant::class.java).insertOrUpdate(StringId(customEnchant._id), customEnchant)
         customEnchant
     }
 }
@@ -77,18 +67,5 @@ fun ItemStack.getOrDefault(customEnchant: CustomEnchant): CustomEnchant {
 fun ItemStack.getEnchantOf(customEnchant: CustomEnchant): Int? {
     val dataContainer = this.itemMeta?.persistentDataContainer
     val persistentData = dataContainer?.let { PersistentData<Int>(it, INTEGER) }
-    return persistentData?.get(customEnchant.name)
-}
-
-fun ItemStack.removeEnchantOf(customEnchant: CustomEnchant) {
-    val dataContainer = itemMeta?.persistentDataContainer?.let { PersistentData<Int>(it, INTEGER) }
-    dataContainer?.let { persistentData ->
-        persistentData.remove(customEnchant.name)
-
-        val loreToRemove = "${customEnchant.name} ${customEnchant.level.toRoman()}"
-
-        itemMeta?.lore?.remove(loreToRemove)
-        println("Removed lore: $loreToRemove")
-    }
-    this.setItemMeta(itemMeta)
+    return persistentData?.get(customEnchant._id)
 }

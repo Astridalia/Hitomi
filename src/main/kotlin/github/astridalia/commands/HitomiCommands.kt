@@ -46,7 +46,7 @@ object HitomiCommands : BaseCommand() {
     @CommandAlias("item")
     @CommandPermission("hitomi.item")
     fun give(id: String, player: Player) {
-        val cachedMongoDBStorage = RedisCache(SerializedItemStack::class.java, "itemStacks")
+        val cachedMongoDBStorage = RedisCache(SerializedItemStack::class.java)
         val stringId = StringId<SerializedItemStack>(id)
         val itemStack = cachedMongoDBStorage.get(stringId)
         if (itemStack == null) {
@@ -68,8 +68,8 @@ object HitomiCommands : BaseCommand() {
     fun addData(player: Player) {
         val itemInUse = player.inventory.itemInMainHand
         val container = itemInUse.itemMeta?.persistentDataContainer ?: return
-        val containers = container.keys.associateWith {
-            container.get(it, PersistentDataType.STRING)
+        val containers = container.keys.associateWith { key ->
+            container.get(key, PersistentDataType.STRING)
         }
         val message = buildString {
             appendLine("Data in containers:")

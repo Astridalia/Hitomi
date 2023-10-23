@@ -26,7 +26,7 @@ data class InventorySurrogate(
     }
 
     fun storeToDatabase(inventory: Inventory, name: String): Inventory {
-        val cachedMongoDBStorage = RedisCache(InventorySurrogate::class.java, "inventories")
+        val cachedMongoDBStorage = RedisCache(InventorySurrogate::class.java)
         val stringId = StringId<InventorySurrogate>("test")
         val invSurrogate = cachedMongoDBStorage.get(stringId)
 

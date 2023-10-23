@@ -17,7 +17,7 @@ object ExplodingArrow : Listener, KoinComponent {
     private const val power = 2.5f
     private val arrowShooters: MutableMap<Arrow, Player> = HashMap()
 
-    private val customEnchant = CustomEnchant(name = "Exploding")
+    private val customEnchant = CustomEnchant("Exploding")
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onEntityShootBowEvent(event: EntityShootBowEvent) {

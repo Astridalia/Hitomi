@@ -2,6 +2,7 @@ package github.astridalia.events
 
 import github.astridalia.character.*
 import github.astridalia.database.RedisCache
+import github.astridalia.items.enchantments.CustomEnchant
 import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -119,7 +120,7 @@ class TestItemsListener : Listener, KoinComponent {
     }
 
     private fun getProfileForEntity(entity: Entity): Profile? {
-        val testStats = RedisCache(Profile::class.java, "players")
+        val testStats = RedisCache(Profile::class.java)
         val entityIdString = StringId<Profile>(entity.uniqueId.toString())
         return testStats.get(entityIdString)
     }
@@ -144,13 +145,22 @@ class TestItemsListener : Listener, KoinComponent {
         // Ensure this event handler is only executed once per player join
 
 
-        val testStats = RedisCache(Profile::class.java, "players")
+        val testStats = RedisCache(Profile::class.java)
         val playerIdString = StringId<Profile>(player.uniqueId.toString())
         val stats = testStats.get(playerIdString) ?: run {
             val itemEntity = Profile(player.uniqueId.toString(), CharacterStats())
             testStats.insertOrUpdate(playerIdString, itemEntity)
             itemEntity
         }
+        val enchantments = RedisCache(CustomEnchant::class.java)
+        val stringIdFiery = StringId<CustomEnchant>("fiery")
+        val enchant = enchantments.get(stringIdFiery) ?: run {
+            val itemEntity = CustomEnchant("fiery")
+            enchantments.insertOrUpdate(stringIdFiery, itemEntity)
+            itemEntity
+        }
+
         println(stats)
+        println(enchant)
     }
 }

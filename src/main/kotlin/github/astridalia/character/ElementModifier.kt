@@ -1,5 +1,8 @@
 package github.astridalia.character
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class ElementModifier(
     val chaosElement: Double = 0.0,
     val earthElement: Double = 0.0,

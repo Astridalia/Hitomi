@@ -1,5 +1,9 @@
 package github.astridalia.character
 
+import kotlinx.serialization.Serializable
+
+
+@Serializable
 data class CharacterStats(
     var level: Int = 1,
     var xp: Double = 0.0,

@@ -9,7 +9,7 @@ import kotlin.random.Random
 
 @Serializable
 data class DropTable(val drops: MutableMap<Int, Double> = mutableMapOf()) {
-    private val cumulativeChances: Map<Int, Double>
+    private var cumulativeChances: Map<Int, Double>
 
     init {
         // Ensure that the chances sum up to 100%
@@ -29,12 +29,16 @@ data class DropTable(val drops: MutableMap<Int, Double> = mutableMapOf()) {
     fun roll(): SerializedItemStack? {
         val cachedMongoDBStorage = RedisCache(SerializedItemStack::class.java)
         val randomValue = Random.nextDouble(0.0, 1.0)
-        for ((id, cumulativeChance) in cumulativeChances) {
-            if (randomValue <= cumulativeChance) {
+        return cumulativeChances.entries
+            .firstOrNull { (_, cumulativeChance) -> randomValue <= cumulativeChance }
+            ?.let { (id, _) ->
                 val stringId = StringId<SerializedItemStack>(id.toString())
-                return cachedMongoDBStorage.get(stringId)
+                cachedMongoDBStorage.get(stringId)
             }
-        }
-        return null
+    }
+
+    init {
+        require(drops.isNotEmpty()) { "Drop table must not be empty" }
+        cumulativeChances = computeCumulativeChances().toMap()
     }
 }

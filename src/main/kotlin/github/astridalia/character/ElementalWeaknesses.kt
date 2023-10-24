@@ -1,7 +1,10 @@
 package github.astridalia.character
 
 import github.astridalia.events.CustomAttributeType
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class ElementalWeaknesses(
     val chaosWeakness: Double = 0.0,
     val earthWeakness: Double = 0.0,

@@ -25,17 +25,19 @@ object MobManager {
     )
 
     fun cleanUp() {
-        mutableListOfPool.forEach(Entity::remove)
-        mutableListOfPool.clear()
+        mutableListOfPool.removeIf { !it.isValid }
     }
 
     fun spawnCustomMob(location: Location, entityType: String, customName: String): Entity? {
         val entityClass = entityClassMap[entityType.uppercase(Locale.getDefault())] ?: return null
-        val entity = location.world?.spawn(location, entityClass) { spawnedEntity ->
-            spawnedEntity.isCustomNameVisible = true
-            spawnedEntity.customName = customName
+        val entity = location.world?.spawn(location, entityClass)
+        entity?.let {
+            val setCustomNameVisibleMethod = it::class.java.getDeclaredMethod("setCustomNameVisible", Boolean::class.java)
+            val setCustomNameMethod = it::class.java.getDeclaredMethod("setCustomName", String::class.java)
+            setCustomNameVisibleMethod.invoke(it, true)
+            setCustomNameMethod.invoke(it, customName)
+            mutableListOfPool.add(it)
         }
-        entity?.let(mutableListOfPool::add)
         return entity
     }
 }

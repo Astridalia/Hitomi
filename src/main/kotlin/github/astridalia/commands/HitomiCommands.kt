@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Subcommand
 import github.astridalia.database.RedisCache
+import github.astridalia.dynamics.SerializableDynamicInventory
 import github.astridalia.dynamics.SerializableDynamicItem
 import github.astridalia.items.enchantments.CustomEnchant
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
@@ -58,6 +59,18 @@ object HitomiCommands : BaseCommand() {
         if (remainingItems.isNotEmpty()) {
             player.sendMessage("Your inventory is full. Some items could not be added.")
         } else player.sendMessage("You have received the item.")
+    }
+
+    @CommandAlias("inventory|inv")
+    @CommandPermission("hitomi.admin")
+    fun openInventory(inventory: String, player: Player) {
+        val cachedMongoDBStorage = RedisCache(SerializableDynamicInventory::class.java)
+        val itemStack = cachedMongoDBStorage.get(StringId(inventory))
+        if (itemStack == null) {
+            player.sendMessage("Inventory with ID $inventory not found.")
+            return
+        }
+        player.openInventory(itemStack.toBukkitInventory())
     }
 
     @CommandAlias("data")

@@ -2,11 +2,16 @@ package github.astridalia.events
 
 import github.astridalia.character.*
 import github.astridalia.database.RedisCache
+import github.astridalia.dynamics.CustomDynamicActions
+import github.astridalia.dynamics.SerializableDynamicInventory
+import github.astridalia.dynamics.SerializableDynamicInventoryItem
+import github.astridalia.dynamics.SerializableDynamicItem
 import github.astridalia.items.enchantments.CustomEnchant
 import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerJoinEvent
 import org.koin.core.component.KoinComponent
 import org.litote.kmongo.id.StringId
@@ -160,7 +165,54 @@ class TestItemsListener : Listener, KoinComponent {
             itemEntity
         }
 
+        val dynamicItem = RedisCache(SerializableDynamicItem::class.java)
+        val stringId = StringId<SerializableDynamicItem>("test")
+        val item = dynamicItem.get(stringId) ?: run {
+            val itemEntity = SerializableDynamicItem(
+                type = "DIAMOND_SWORD",
+                name = "test_item",
+                lore = mutableListOf(),
+                model = 0
+            )
+            dynamicItem.insertOrUpdate(stringId, itemEntity)
+            itemEntity
+        }
+        player.inventory.addItem(item.toItemStack())
+
+
+        val itemSerial = SerializableDynamicInventoryItem(
+            type = "DIAMOND_SWORD",
+            name = "test_item",
+            lore = mutableListOf(),
+            model = 0,
+            data = mutableMapOf(),
+            action = CustomDynamicActions.NONE,
+        )
+
+        val testNewDynamicInventory = RedisCache(SerializableDynamicInventory::class.java)
+        val stringIdNewDynamicInventory = StringId<SerializableDynamicInventory>("test")
+        val newDynamicInventory = testNewDynamicInventory.get(stringIdNewDynamicInventory) ?: run {
+            val itemEntity = SerializableDynamicInventory(
+                title = "test",
+                size = InventoryType.CHEST.defaultSize,
+                items = mutableMapOf(
+                    0 to itemSerial.also {
+                        it.action = CustomDynamicActions.CLOSE
+                    },
+                    1 to itemSerial.also {
+                        it.action = CustomDynamicActions.EXECUTE
+                        it.data["command"] = "say hi"
+                    },
+                )
+            )
+            testNewDynamicInventory.insertOrUpdate(stringIdNewDynamicInventory, itemEntity)
+            itemEntity
+        }
+
+        player.openInventory(newDynamicInventory.toBukkitInventory())
         println(stats)
         println(enchant)
     }
+
+
 }

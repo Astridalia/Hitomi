@@ -23,7 +23,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test"))
-    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.2-R0.1-SNAPSHOT")
     implementation("org.litote.kmongo:kmongo:4.10.0")
     implementation("io.insert-koin:koin-core:3.5.0")
     implementation("org.reflections:reflections:0.10.2")

@@ -3,8 +3,8 @@ package github.astridalia
 import co.aikar.commands.PaperCommandManager
 import github.astridalia.commands.HitomiCommands
 import github.astridalia.commands.wand.WandCommand
+import github.astridalia.dynamics.DynamicListener
 import github.astridalia.events.TestItemsListener
-import github.astridalia.items.SerializedItemStack
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
 import github.astridalia.items.enchantments.events.CubicMiningBlocks
 import github.astridalia.items.enchantments.events.ExplodingArrow
@@ -29,8 +29,8 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         single { ExplodingArrow }
         single { CubicMiningBlocks }
         single { SimpleAttackEnchantments }
-        single { SerializedItemStack }
         single { PaperCommandManager(get()) }
+
     }
 
     private val paperCommandManager: PaperCommandManager by inject()
@@ -60,7 +60,8 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
             explodingArrowEvent,
             cubicMiningEvent,
             WandCommand,
-            simpleAttackEnchantments
+            simpleAttackEnchantments,
+            DynamicListener
         )
     }
 

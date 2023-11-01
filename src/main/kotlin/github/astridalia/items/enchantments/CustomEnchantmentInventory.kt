@@ -1,6 +1,6 @@
 package github.astridalia.items.enchantments
 
-import github.astridalia.items.SerializedItemStack
+import github.astridalia.dynamics.SerializableDynamicItem
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -20,14 +20,14 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
 
     private const val ENCHANTMENT_ITEM_SLOT = 11
     private const val ENCHANTMENT_BOOK_SLOT = 13
-    private const val ITEM_PROTECTION_SLOT = 15
     private const val CONFIRMATION_ITEM_ENCHANT = 16
 
+    // /enchant <enchantment> <level> <item>
     @EventHandler
     fun onInventoryOpen(e: InventoryOpenEvent) {
         val inventory = e.inventory
         if (inventory !== hitomiEnchantInv) return
-        val decoration = SerializedItemStack(type = Material.BLACK_STAINED_GLASS_PANE.name)
+        val decoration = SerializableDynamicItem(type = Material.BLACK_STAINED_GLASS_PANE.name, " ")
         (0..<27)
             .filter {
                 it !in arrayOf(
@@ -39,14 +39,13 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
             .forEach { hitomiEnchantInv.setItem(it, decoration.toItemStack()) }
         inventory.setItem(
             CONFIRMATION_ITEM_ENCHANT,
-            SerializedItemStack(type = Material.CYAN_STAINED_GLASS_PANE.name, name = "Enchant item").toItemStack()
+            SerializableDynamicItem(type = Material.CYAN_STAINED_GLASS_PANE.name, "Enchant Item").toItemStack()
         )
     }
 
     @EventHandler
     fun onInventoryClose(e: InventoryCloseEvent) {
         val itemBook = e.inventory.getItem(ENCHANTMENT_BOOK_SLOT)
-        val itemProtection = e.inventory.getItem(ITEM_PROTECTION_SLOT)
         val item = e.inventory.getItem(ENCHANTMENT_ITEM_SLOT)
 
         fun returnItemToPlayerSlot(item: ItemStack?, player: Player, slot: Int) {

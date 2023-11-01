@@ -1,4 +1,5 @@
 package github.astridalia.character
+
 import kotlinx.serialization.Serializable
 
 

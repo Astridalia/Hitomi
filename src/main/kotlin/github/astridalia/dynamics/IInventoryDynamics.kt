@@ -5,8 +5,6 @@ interface IInventoryDynamics {
     var size: Int
     var items: MutableMap<Int, SerializableDynamicInventoryItem>
     var isCancelled: Boolean
-    fun setItem(slot: Int, item: SerializableDynamicInventoryItem)
-
 
     fun toBukkitInventory(): org.bukkit.inventory.Inventory {
         val inventory = org.bukkit.Bukkit.createInventory(null, size, title)
@@ -24,6 +22,10 @@ interface IInventoryDynamics {
         return inventory
     }
 
+    fun open(player: org.bukkit.entity.Player) {
+        player.openInventory(toBukkitInventory())
+    }
+
     fun setItem(
         slot: Int,
         item: SerializableDynamicInventoryItem,
@@ -34,6 +36,10 @@ interface IInventoryDynamics {
 
     fun removeItem(slot: Int) {
         items.remove(slot)
+    }
+
+    fun setItem(slot: Int, item: SerializableDynamicInventoryItem) {
+        items[slot] = item
     }
 
     fun getAction(slot: Int): CustomDynamicActions? {

@@ -10,8 +10,4 @@ data class SerializableDynamicInventory(
     override var size: Int = InventoryType.CHEST.defaultSize,
     override var items: MutableMap<Int, SerializableDynamicInventoryItem> = mutableMapOf(),
     override var isCancelled: Boolean = true,
-) : IInventoryDynamics {
-    override fun setItem(slot: Int, item: SerializableDynamicInventoryItem) {
-        items[slot] = item
-    }
-}
+) : IInventoryDynamics

@@ -147,9 +147,6 @@ class TestItemsListener : Listener, KoinComponent {
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
 
-        // Ensure this event handler is only executed once per player join
-
-
         val testStats = RedisCache(Profile::class.java)
         val playerIdString = StringId<Profile>(player.uniqueId.toString())
         val stats = testStats.get(playerIdString) ?: run {
@@ -180,36 +177,27 @@ class TestItemsListener : Listener, KoinComponent {
         player.inventory.addItem(item.toItemStack())
 
 
-        val itemSerial = SerializableDynamicInventoryItem(
-            type = "DIAMOND_SWORD",
-            name = "test_item",
-            lore = mutableListOf(),
-            model = 0,
-            data = mutableMapOf(),
-            action = CustomDynamicActions.NONE,
-        )
-
-        val testNewDynamicInventory = RedisCache(SerializableDynamicInventory::class.java)
-        val stringIdNewDynamicInventory = StringId<SerializableDynamicInventory>("test")
-        val newDynamicInventory = testNewDynamicInventory.get(stringIdNewDynamicInventory) ?: run {
-            val itemEntity = SerializableDynamicInventory(
+        val dynamicInventory = RedisCache(SerializableDynamicInventory::class.java)
+        val stringIdInventory = StringId<SerializableDynamicInventory>("test")
+        val inventory = dynamicInventory.get(stringIdInventory) ?: run {
+            val inventoryEntity = SerializableDynamicInventory(
                 title = "test",
                 size = InventoryType.CHEST.defaultSize,
                 items = mutableMapOf(
-                    0 to itemSerial.also {
-                        it.action = CustomDynamicActions.CLOSE
-                    },
-                    1 to itemSerial.also {
-                        it.action = CustomDynamicActions.EXECUTE
-                        it.data["command"] = "say hi"
-                    },
+                    0 to SerializableDynamicInventoryItem(
+                        type = "DIAMOND_SWORD",
+                        name = "test_item",
+                        lore = mutableListOf(),
+                        model = 0,
+                        action = CustomDynamicActions.CLOSE
+                    )
                 )
             )
-            testNewDynamicInventory.insertOrUpdate(stringIdNewDynamicInventory, itemEntity)
-            itemEntity
+            dynamicInventory.insertOrUpdate(stringIdInventory, inventoryEntity)
+            inventoryEntity
         }
 
-        player.openInventory(newDynamicInventory.toBukkitInventory())
+
         println(stats)
         println(enchant)
     }

@@ -1,5 +1,6 @@
 package github.astridalia.database
 
+import com.mongodb.client.model.changestream.ChangeStreamDocument
 import org.litote.kmongo.Id
 
 
@@ -8,4 +9,5 @@ interface Storage<T : Any> {
     fun get(id: Id<T>): T?
     fun getAll(): List<T>
     fun remove(id: Id<T>)
+    fun listenForChanges(onChange: (ChangeStreamDocument<T>) -> Unit)
 }

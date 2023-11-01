@@ -1,6 +1,7 @@
 package github.astridalia.items.rpg
 
-import github.astridalia.items.SerializedItemStack
+import github.astridalia.dynamics.SerializableDynamicItem
+
 
 data class Equipment(
     val id: Int,
@@ -10,5 +11,5 @@ data class Equipment(
     val rarity: EquipmentRarity = EquipmentRarity.COMMON,
     val slot: EquipmentSlot,
     val attributes: EquipmentAttributes,
-    val itemStack: SerializedItemStack
+    val itemStack: SerializableDynamicItem
 )

@@ -1,6 +1,7 @@
 package github.astridalia.dynamics
 
 import github.astridalia.database.RedisCache
+import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -13,75 +14,47 @@ import org.litote.kmongo.id.StringId
 object DynamicListener : Listener {
     private val dynamicInventory = RedisCache(SerializableDynamicInventory::class.java)
 
+    private fun handleInventoryChange(viewers: Collection<HumanEntity>) {
+        val viewersList = ArrayList(viewers)
+        viewersList.forEach { it.closeInventory() }
+    }
+
     @EventHandler
     fun onOpenInventory(event: InventoryOpenEvent) {
         val inventory = dynamicInventory.get(StringId(event.view.title)) ?: return
-        dynamicInventory.listenForChanges {
-            val viewers = ArrayList(event.viewers)
-            viewers.forEach {
-                it.closeInventory()
-            }
-
-        }
-        inventory.items.forEach {
-            event.inventory.setItem(it.key, it.value.toItemStack())
-        }
+        dynamicInventory.listenForChanges { handleInventoryChange(event.viewers) }
+        inventory.items.forEach { event.inventory.setItem(it.key, it.value.toItemStack()) }
     }
 
     @EventHandler
     fun onCloseInventory(event: InventoryCloseEvent) {
         val inventory = dynamicInventory.get(StringId(event.view.title)) ?: return
-        val player = event.player as? Player ?: return
-        dynamicInventory.listenForChanges {
-            val viewers = ArrayList(event.viewers)
-            //close all viewers
-            viewers.forEach {
-                it.closeInventory()
-            }
-        }
-        if (!inventory.isCancelled) return
-        event.inventory.clear()
+        dynamicInventory.listenForChanges { handleInventoryChange(event.viewers) }
+        if (!inventory.isCancelled) event.inventory.clear()
     }
 
     @EventHandler
     fun onClick(event: InventoryClickEvent) {
-
         val inventory = dynamicInventory.get(StringId(event.view.title)) ?: return
         val item = inventory.getItemAction(event.slot) ?: return
         event.isCancelled = inventory.isCancelled
         val persistentData = event.currentItem?.itemMeta?.persistentDataContainer ?: return
         val player = event.whoClicked as? Player ?: return
-        dynamicInventory.listenForChanges {
-            event.viewers.forEach {
-                it.closeInventory()
-            }
-        }
+        dynamicInventory.listenForChanges { handleInventoryChange(event.viewers) }
+        val inventoryId = persistentData.get(item.namespaceKey("inventory"), PersistentDataType.STRING)
         when (item.action) {
-            CustomDynamicActions.CLOSE -> event.whoClicked.closeInventory()
+            CustomDynamicActions.CLOSE -> player.closeInventory()
             CustomDynamicActions.EXECUTE -> {
                 persistentData.get(item.namespaceKey("command"), PersistentDataType.STRING)?.let {
-                    player.server.dispatchCommand(event.whoClicked, it)
+                    player.server.dispatchCommand(player, it)
                 }
             }
 
-            CustomDynamicActions.NONE -> return
-            CustomDynamicActions.OPEN -> {
-                persistentData.get(item.namespaceKey("inventory"), PersistentDataType.STRING)?.let {
-                    dynamicInventory.get(StringId(it))?.open(player)
-                }
+            CustomDynamicActions.OPEN, CustomDynamicActions.NEXT_PAGE, CustomDynamicActions.PREVIOUS_PAGE -> {
+                inventoryId?.let { dynamicInventory.get(StringId(inventoryId))?.open(player) }
             }
 
-            CustomDynamicActions.NEXT_PAGE -> {
-                persistentData.get(item.namespaceKey("inventory"), PersistentDataType.STRING)?.let {
-                    dynamicInventory.get(StringId(it))?.open(player)
-                }
-            }
-
-            CustomDynamicActions.PREVIOUS_PAGE -> {
-                persistentData.get(item.namespaceKey("inventory"), PersistentDataType.STRING)?.let {
-                    dynamicInventory.get(StringId(it))?.open(player)
-                }
-            }
+            else -> return
         }
     }
 }

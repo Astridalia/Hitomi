@@ -23,6 +23,7 @@ object DynamicListener : Listener {
                     event.whoClicked.server.dispatchCommand(event.whoClicked, it)
                 }
             }
+
             CustomDynamicActions.NONE -> return
             CustomDynamicActions.OPEN -> {
                 persistentData.get(item.namespaceKey("inventory"), PersistentDataType.STRING)?.let {
@@ -30,12 +31,14 @@ object DynamicListener : Listener {
                         ?.let { it1 -> event.whoClicked.openInventory(it1) }
                 }
             }
+
             CustomDynamicActions.NEXT_PAGE -> {
                 persistentData.get(item.namespaceKey("inventory"), PersistentDataType.STRING)?.let {
                     dynamicInventory.get(StringId(it))?.toBukkitInventory()
                         ?.let { it1 -> event.whoClicked.openInventory(it1) }
                 }
             }
+
             CustomDynamicActions.PREVIOUS_PAGE -> {
                 persistentData.get(item.namespaceKey("inventory"), PersistentDataType.STRING)?.let {
                     dynamicInventory.get(StringId(it))?.toBukkitInventory()

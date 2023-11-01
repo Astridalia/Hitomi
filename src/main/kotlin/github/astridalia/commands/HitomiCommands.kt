@@ -10,9 +10,7 @@ import github.astridalia.dynamics.SerializableDynamicItem
 import github.astridalia.items.enchantments.CustomEnchant
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
 import github.astridalia.items.enchantments.enchantOf
-import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.litote.kmongo.id.StringId
 

@@ -39,7 +39,7 @@ object CustomEnchantmentInventory : KoinComponent, Listener {
             .forEach { hitomiEnchantInv.setItem(it, decoration.toItemStack()) }
         inventory.setItem(
             CONFIRMATION_ITEM_ENCHANT,
-            SerializableDynamicItem(type = Material.CYAN_STAINED_GLASS_PANE.name,"Enchant Item").toItemStack()
+            SerializableDynamicItem(type = Material.CYAN_STAINED_GLASS_PANE.name, "Enchant Item").toItemStack()
         )
     }
 

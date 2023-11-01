@@ -203,7 +203,8 @@ class TestItemsListener : Listener, KoinComponent {
                         it.action = CustomDynamicActions.EXECUTE
                         it.data["command"] = "say hi"
                     },
-                ))
+                )
+            )
             testNewDynamicInventory.insertOrUpdate(stringIdNewDynamicInventory, itemEntity)
             itemEntity
         }

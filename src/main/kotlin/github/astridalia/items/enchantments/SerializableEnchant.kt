@@ -10,4 +10,4 @@ data class SerializableEnchant(
     override var level: Int,
     override var maxLevel: Int,
     override var applicableMaterials: MutableList<String>
-): IEnchant
+) : IEnchant

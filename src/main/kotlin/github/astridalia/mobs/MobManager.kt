@@ -32,7 +32,8 @@ object MobManager {
         val entityClass = entityClassMap[entityType.uppercase(Locale.getDefault())] ?: return null
         val entity = location.world?.spawn(location, entityClass)
         entity?.let {
-            val setCustomNameVisibleMethod = it::class.java.getDeclaredMethod("setCustomNameVisible", Boolean::class.java)
+            val setCustomNameVisibleMethod =
+                it::class.java.getDeclaredMethod("setCustomNameVisible", Boolean::class.java)
             val setCustomNameMethod = it::class.java.getDeclaredMethod("setCustomName", String::class.java)
             setCustomNameVisibleMethod.invoke(it, true)
             setCustomNameMethod.invoke(it, customName)

@@ -9,7 +9,7 @@ import redis.clients.jedis.JedisPoolConfig
 
 class RedisCache<T : Any>(
     private val clazz: Class<T>,
-    private val cacheExpirationMinutes: Long = 30,
+    private val cacheExpirationMinutes: Long = 60,
 ) : Storage<T>, MongoDBStorage<T>(clazz) {
 
     private val jedisPool = JedisPool(JedisPoolConfig(), "localhost")

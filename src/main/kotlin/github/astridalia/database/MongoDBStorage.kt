@@ -1,6 +1,10 @@
 package github.astridalia.database
 
 import com.mongodb.client.model.UpdateOptions
+import com.mongodb.client.model.changestream.ChangeStreamDocument
+import github.astridalia.HitomiPlugin
+import org.bukkit.Bukkit
+import org.bukkit.plugin.java.JavaPlugin
 import org.litote.kmongo.Id
 import org.litote.kmongo.deleteOneById
 import org.litote.kmongo.findOneById
@@ -25,5 +29,17 @@ open class MongoDBStorage<T : Any>(private val clazz: Class<T>) : Storage<T> {
 
     override fun remove(id: Id<T>) {
         collection.deleteOneById(id)
+    }
+
+    override fun listenForChanges(onChange: (ChangeStreamDocument<T>) -> Unit) {
+        Thread {
+            val changeStream = collection.watch(clazz)
+            val iterator = changeStream.iterator()
+            while (iterator.hasNext()) {
+                val change = iterator.next()
+                val javaPlugin = JavaPlugin.getProvidingPlugin(HitomiPlugin::class.java)
+                Bukkit.getScheduler().runTask(javaPlugin, Runnable { onChange(change) })
+            }
+        }.start()
     }
 }

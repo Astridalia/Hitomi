@@ -18,12 +18,13 @@ import org.litote.kmongo.id.StringId
 @CommandAlias("hitomi|hi")
 @CommandPermission("hitomi.commands")
 object HitomiCommands : BaseCommand() {
-    @Subcommand("inventory")
+    @Subcommand("inventory|inv")
     @CommandPermission("hitomi.admin")
     fun openinv(player: Player) {
         player.closeInventory()
         player.openInventory(CustomEnchantmentInventory.hitomiEnchantInv)
     }
+
 
     @CommandAlias("enchant")
     @CommandPermission("hitomi.enchanting.enchant")

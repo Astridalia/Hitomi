@@ -1,6 +1,6 @@
 package github.astridalia.items.enchantments
 
-import github.astridalia.dynamics.SerializableDynamicItem
+import github.astridalia.dynamics.items.SerializableDynamicItem
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material

@@ -2,10 +2,10 @@ package github.astridalia
 
 import co.aikar.commands.PaperCommandManager
 import github.astridalia.commands.HitomiCommands
-import github.astridalia.commands.wand.WandCommand
-import github.astridalia.dynamics.DynamicListener
+import github.astridalia.dynamics.listeners.DynamicListener
 import github.astridalia.events.TestItemsListener
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
+import github.astridalia.items.enchantments.events.AutoSmelting
 import github.astridalia.items.enchantments.events.CubicMiningBlocks
 import github.astridalia.items.enchantments.events.ExplodingArrow
 import github.astridalia.items.enchantments.events.SimpleAttackEnchantments
@@ -52,14 +52,13 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         }
 
         paperCommandManager.registerCommand(HitomiCommands)
-        paperCommandManager.registerCommand(WandCommand)
 
         registerEventListeners(
             testItemsListener,
             customEnchantmentInventory,
             explodingArrowEvent,
             cubicMiningEvent,
-            WandCommand,
+            AutoSmelting,
             simpleAttackEnchantments,
             DynamicListener
         )

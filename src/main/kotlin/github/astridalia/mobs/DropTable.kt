@@ -1,7 +1,7 @@
 package github.astridalia.mobs
 
 import github.astridalia.database.RedisCache
-import github.astridalia.dynamics.SerializableDynamicItem
+import github.astridalia.dynamics.items.SerializableDynamicItem
 import kotlinx.serialization.Serializable
 import org.litote.kmongo.id.StringId
 import kotlin.random.Random

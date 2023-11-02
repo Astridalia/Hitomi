@@ -5,8 +5,8 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Subcommand
 import github.astridalia.database.RedisCache
-import github.astridalia.dynamics.SerializableDynamicInventory
-import github.astridalia.dynamics.SerializableDynamicItem
+import github.astridalia.dynamics.inventories.SerializableDynamicInventory
+import github.astridalia.dynamics.items.SerializableDynamicItem
 import github.astridalia.items.enchantments.CustomEnchant
 import github.astridalia.items.enchantments.CustomEnchantmentInventory
 import github.astridalia.items.enchantments.enchantOf
@@ -24,7 +24,6 @@ object HitomiCommands : BaseCommand() {
         player.closeInventory()
         player.openInventory(CustomEnchantmentInventory.hitomiEnchantInv)
     }
-
 
     @CommandAlias("enchant")
     @CommandPermission("hitomi.enchanting.enchant")

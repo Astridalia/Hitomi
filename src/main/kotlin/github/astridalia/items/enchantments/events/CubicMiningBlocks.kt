@@ -29,6 +29,10 @@ object CubicMiningBlocks : KoinComponent, Listener {
         val cubicMiningLevel = itemInMainHand.getEnchantOf(customEnchant) ?: 0
         if (cubicMiningLevel <= 0) return
 
+        // Check if the player has the Auto Smelting enchantment
+        val autoSmeltLevel = itemInMainHand.getEnchantOf(AutoSmelting.customEnchant) ?: 0
+        if (autoSmeltLevel > 0) AutoSmelting.onBlockBreak(event)
+
         val cubeBlocks = getCubicBlocks(block)
         breakCubicBlocks(player, cubeBlocks)
     }
@@ -44,7 +48,17 @@ object CubicMiningBlocks : KoinComponent, Listener {
                 0.1,
                 cubeBlock.blockData
             )
-            cubeBlock.breakNaturally()
+
+            // Create a new BlockBreakEvent for the cubeBlock
+            val event = BlockBreakEvent(cubeBlock, player)
+
+            // Apply AutoSmelting if the player has the enchantment
+            val itemInMainHand = player.inventory.itemInMainHand
+            val autoSmeltLevel = itemInMainHand.getEnchantOf(AutoSmelting.customEnchant) ?: 0
+            if (autoSmeltLevel > 0) AutoSmelting.onBlockBreak(event)
+
+            // If the event was not cancelled by AutoSmelting, break the block naturally
+            if (!event.isCancelled) cubeBlock.breakNaturally()
         }
     }
 

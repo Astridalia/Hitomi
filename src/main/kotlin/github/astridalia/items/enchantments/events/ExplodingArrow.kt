@@ -24,20 +24,25 @@ object ExplodingArrow : Listener, KoinComponent {
         val shooter = event.entity as? Player ?: return
         val bow = event.bow ?: return
 
-        val getFrom = bow.getEnchantOf(customEnchant) ?: 0
-        if (getFrom <= 0) return
-        val arrow = event.projectile as? Arrow ?: return
-        arrowShooters[arrow] = shooter
+        bow.getEnchantOf(customEnchant)?.let { enchantment ->
+            if (enchantment > 0) {
+                (event.projectile as? Arrow)?.let { arrow ->
+                    arrowShooters[arrow] = shooter
+                }
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onProjectileHit(event: ProjectileHitEvent) {
         val arrow = event.entity as? Arrow ?: return
-        val shooter = arrowShooters[arrow] ?: return
-        arrowShooters.remove(arrow)
-        val explodingLevel = shooter.inventory.itemInMainHand.getEnchantOf(customEnchant) ?: 0
-        if (explodingLevel <= 0) return
-        explodeArrow(arrow, power * explodingLevel)
+        val shooter = arrowShooters.remove(arrow) ?: return
+
+        shooter.inventory.itemInMainHand.getEnchantOf(customEnchant)?.let { explodingLevel ->
+            if (explodingLevel > 0) {
+                explodeArrow(arrow, power * explodingLevel)
+            }
+        }
     }
 
     private fun explodeArrow(arrow: Arrow, explosionPower: Float) {
@@ -48,14 +53,14 @@ object ExplodingArrow : Listener, KoinComponent {
 
         // Spawn particle animation along the arrow trail
         val particleCount = 100
-        for (i in 0..<particleCount) {
+        repeat(particleCount) {
             // Calculate random offsets for particle spawning
             val offsetX = (Math.random() - 0.5) * 2.0
             val offsetY = (Math.random() - 0.5) * 2.0
             val offsetZ = (Math.random() - 0.5) * 2.0
 
             // Calculate the position slightly ahead of the arrow's position
-            val spawnLocation = arrow.location.clone().add(arrow.velocity.normalize().multiply(i * 0.1))
+            val spawnLocation = arrow.location.clone().add(arrow.velocity.normalize().multiply(it * 0.1))
 
             // Spawn the particle at the calculated location with random offsets
             world.spawnParticle(

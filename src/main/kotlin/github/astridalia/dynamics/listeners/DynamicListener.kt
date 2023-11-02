@@ -1,6 +1,8 @@
-package github.astridalia.dynamics
+package github.astridalia.dynamics.listeners
 
 import github.astridalia.database.RedisCache
+import github.astridalia.dynamics.CustomDynamicActions
+import github.astridalia.dynamics.inventories.SerializableDynamicInventory
 import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -51,9 +53,11 @@ object DynamicListener : Listener {
                     player.server.dispatchCommand(player, it)
                 }
             }
+
             CustomDynamicActions.OPEN, CustomDynamicActions.NEXT_PAGE, CustomDynamicActions.PREVIOUS_PAGE -> {
                 inventoryId?.let { dynamicInventory.get(StringId(inventoryId))?.open(player) }
             }
+
             else -> return
         }
     }

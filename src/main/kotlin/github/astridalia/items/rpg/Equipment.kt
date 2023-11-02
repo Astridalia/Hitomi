@@ -1,6 +1,6 @@
 package github.astridalia.items.rpg
 
-import github.astridalia.dynamics.SerializableDynamicItem
+import github.astridalia.dynamics.items.SerializableDynamicItem
 
 
 data class Equipment(

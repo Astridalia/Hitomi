@@ -1,7 +1,7 @@
-package github.astridalia.items.enchantments.events
+package github.astridalia.dynamics.items.enchantments.events
 
-import github.astridalia.items.enchantments.CustomEnchant
-import github.astridalia.items.enchantments.getEnchantOf
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant.Companion.getEnchantOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
@@ -20,7 +20,11 @@ import org.koin.java.KoinJavaComponent.inject
 
 object CubicMiningBlocks : KoinComponent, Listener {
     private val javaPlugin: JavaPlugin by inject(JavaPlugin::class.java)
-    private val customEnchant = CustomEnchant("ExplodingMine")
+    private val customEnchant = SerializableEnchant(
+        "Exploding_Mine",
+        level = 1,
+        description = "Mines blocks around 3x3 area."
+    )
     private val scope = CoroutineScope(Dispatchers.Default)
 
     private val unbreakableMaterials = setOf(

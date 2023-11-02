@@ -1,14 +1,14 @@
-package github.astridalia.items.enchantments.events
+package github.astridalia.dynamics.items.enchantments.events
 
-import github.astridalia.items.enchantments.CustomEnchant
-import github.astridalia.items.enchantments.getEnchantOf
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant.Companion.getEnchantOf
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 
 object AutoSmelting : Listener {
-    val customEnchant = CustomEnchant("AutoSmelting")
+    val customEnchant = SerializableEnchant("AutoSmelting", level = 1)
 
     private val smelts = mutableMapOf(
         Material.IRON_ORE to Material.IRON_INGOT,

@@ -3,13 +3,11 @@ package github.astridalia.commands
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
-import co.aikar.commands.annotation.Subcommand
 import github.astridalia.database.RedisCache
 import github.astridalia.dynamics.inventories.SerializableDynamicInventory
 import github.astridalia.dynamics.items.SerializableDynamicItem
-import github.astridalia.items.enchantments.CustomEnchant
-import github.astridalia.items.enchantments.CustomEnchantmentInventory
-import github.astridalia.items.enchantments.enchantOf
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant.Companion.enchantOf
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
 import org.litote.kmongo.id.StringId
@@ -18,17 +16,10 @@ import org.litote.kmongo.id.StringId
 @CommandAlias("hitomi|hi")
 @CommandPermission("hitomi.commands")
 object HitomiCommands : BaseCommand() {
-    @Subcommand("inventory|inv")
-    @CommandPermission("hitomi.admin")
-    fun openinv(player: Player) {
-        player.closeInventory()
-        player.openInventory(CustomEnchantmentInventory.hitomiEnchantInv)
-    }
-
     @CommandAlias("enchant")
     @CommandPermission("hitomi.enchanting.enchant")
-    fun enchant(enchantment: String, player: Player) {
-        val enchantmentMatches = CustomEnchant.matches(enchantment)
+    fun enchant(enchantment: String, level: Int, player: Player) {
+        val enchantmentMatches = SerializableEnchant.matches(enchantment.replace("\\s+".toRegex(), "_"))
         if (enchantmentMatches == null) {
             player.sendMessage("Enchantment doesn't exist!")
             return

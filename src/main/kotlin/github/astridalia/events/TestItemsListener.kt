@@ -4,6 +4,7 @@ import github.astridalia.character.CharacterStats
 import github.astridalia.character.Profile
 import github.astridalia.database.RedisCache
 import github.astridalia.dynamics.items.SerializableDynamicItem
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant
 import github.astridalia.events.MathCalculations.calculateStatsBetweenAttackerAndDefender
 import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
@@ -46,6 +47,19 @@ class TestItemsListener : Listener, KoinComponent {
             val itemEntity = Profile(player.uniqueId.toString(), CharacterStats())
             testStats.insertOrUpdate(playerIdString, itemEntity)
             itemEntity
+        }
+
+        val newEnchantSerializer = RedisCache(SerializableEnchant::class.java)
+        val enchantId = StringId<SerializableEnchant>("fiery")
+        newEnchantSerializer.get(enchantId) ?: run {
+            val enchantEntity = SerializableEnchant(
+                name = "fiery",
+                level = 1,
+                maxLevel = 5,
+                description = "Sets the target on fire for a period of time."
+            )
+            newEnchantSerializer.insertOrUpdate(enchantId, enchantEntity)
+            enchantEntity
         }
 
         // TODO: adding in more upgrades soon!

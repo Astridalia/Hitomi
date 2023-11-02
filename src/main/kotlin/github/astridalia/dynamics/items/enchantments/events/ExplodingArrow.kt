@@ -1,8 +1,8 @@
-package github.astridalia.items.enchantments.events
+package github.astridalia.dynamics.items.enchantments.events
 
 
-import github.astridalia.items.enchantments.CustomEnchant
-import github.astridalia.items.enchantments.getEnchantOf
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant.Companion.getEnchantOf
 import org.bukkit.Particle
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Player
@@ -17,7 +17,7 @@ object ExplodingArrow : Listener, KoinComponent {
     private const val power = 2.5f
     private val arrowShooters: MutableMap<Arrow, Player> = HashMap()
 
-    private val customEnchant = CustomEnchant("Exploding")
+    private val customEnchant = SerializableEnchant("Exploding_Arrows", level = 1)
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onEntityShootBowEvent(event: EntityShootBowEvent) {

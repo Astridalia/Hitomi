@@ -2,13 +2,12 @@ package github.astridalia
 
 import co.aikar.commands.PaperCommandManager
 import github.astridalia.commands.HitomiCommands
-import github.astridalia.commands.wand.WandCommand
-import github.astridalia.dynamics.DynamicListener
+import github.astridalia.dynamics.items.enchantments.events.AutoSmelting
+import github.astridalia.dynamics.items.enchantments.events.CubicMiningBlocks
+import github.astridalia.dynamics.items.enchantments.events.ExplodingArrow
+import github.astridalia.dynamics.items.enchantments.events.SimpleAttackEnchantments
+import github.astridalia.dynamics.listeners.DynamicListener
 import github.astridalia.events.TestItemsListener
-import github.astridalia.items.enchantments.CustomEnchantmentInventory
-import github.astridalia.items.enchantments.events.CubicMiningBlocks
-import github.astridalia.items.enchantments.events.ExplodingArrow
-import github.astridalia.items.enchantments.events.SimpleAttackEnchantments
 import github.astridalia.mobs.MobManager
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
@@ -25,7 +24,6 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         single<JavaPlugin> { this@HitomiPlugin }
         single<Plugin> { this@HitomiPlugin }
         single { TestItemsListener() }
-        single { CustomEnchantmentInventory }
         single { ExplodingArrow }
         single { CubicMiningBlocks }
         single { SimpleAttackEnchantments }
@@ -39,7 +37,6 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
     private val cubicMiningEvent: CubicMiningBlocks by inject()
 
     private val testItemsListener: TestItemsListener by inject()
-    private val customEnchantmentInventory: CustomEnchantmentInventory by inject()
 
     override fun onEnable() {
         System.setProperty(
@@ -52,14 +49,12 @@ class HitomiPlugin : JavaPlugin(), KoinComponent {
         }
 
         paperCommandManager.registerCommand(HitomiCommands)
-        paperCommandManager.registerCommand(WandCommand)
 
         registerEventListeners(
             testItemsListener,
-            customEnchantmentInventory,
             explodingArrowEvent,
             cubicMiningEvent,
-            WandCommand,
+            AutoSmelting,
             simpleAttackEnchantments,
             DynamicListener
         )

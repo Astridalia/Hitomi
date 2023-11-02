@@ -1,4 +1,8 @@
-package github.astridalia.dynamics
+package github.astridalia.dynamics.inventories
+
+import github.astridalia.dynamics.CustomDynamicActions
+import github.astridalia.dynamics.items.IGUIActionItem
+import github.astridalia.dynamics.items.SerializableDynamicItem
 
 interface IInventoryDynamics {
     var title: String

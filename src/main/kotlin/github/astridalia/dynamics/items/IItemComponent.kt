@@ -1,4 +1,4 @@
-package github.astridalia.dynamics
+package github.astridalia.dynamics.items
 
 import github.astridalia.HitomiPlugin
 import org.bukkit.Material

@@ -1,7 +1,12 @@
-package github.astridalia.items.enchantments.events
+package github.astridalia.dynamics.items.enchantments.events
 
-import github.astridalia.items.enchantments.CustomEnchant
-import github.astridalia.items.enchantments.getEnchantOf
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant.Companion.getEnchantOf
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.launch
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.block.Block
@@ -9,10 +14,18 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
+import org.koin.java.KoinJavaComponent.inject
 
 object CubicMiningBlocks : KoinComponent, Listener {
-    private val customEnchant = CustomEnchant("ExplodingMine")
+    private val javaPlugin: JavaPlugin by inject(JavaPlugin::class.java)
+    private val customEnchant = SerializableEnchant(
+        "Exploding_Mine",
+        level = 1,
+        description = "Mines blocks around 3x3 area."
+    )
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     private val unbreakableMaterials = setOf(
         Material.BEDROCK, Material.BARRIER, Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK,
@@ -29,8 +42,18 @@ object CubicMiningBlocks : KoinComponent, Listener {
         val cubicMiningLevel = itemInMainHand.getEnchantOf(customEnchant) ?: 0
         if (cubicMiningLevel <= 0) return
 
+        // Check if the player has the Auto Smelting enchantment
+        val autoSmeltLevel = itemInMainHand.getEnchantOf(AutoSmelting.customEnchant) ?: 0
+        if (autoSmeltLevel > 0) AutoSmelting.onBlockBreak(event)
+
         val cubeBlocks = getCubicBlocks(block)
-        breakCubicBlocks(player, cubeBlocks)
+
+        // Delay the execution of breakCubicBlocks
+        scope.launch {
+            Bukkit.getScheduler().runTask(javaPlugin, Runnable { // Switch back to the main thread
+                breakCubicBlocks(player, cubeBlocks)
+            })
+        }
     }
 
     private fun breakCubicBlocks(player: Player, cubeBlocks: List<Block>) {
@@ -44,7 +67,17 @@ object CubicMiningBlocks : KoinComponent, Listener {
                 0.1,
                 cubeBlock.blockData
             )
-            cubeBlock.breakNaturally()
+
+            // Create a new BlockBreakEvent for the cubeBlock
+            val event = BlockBreakEvent(cubeBlock, player)
+
+            // Apply AutoSmelting if the player has the enchantment
+            val itemInMainHand = player.inventory.itemInMainHand
+            val autoSmeltLevel = itemInMainHand.getEnchantOf(AutoSmelting.customEnchant) ?: 0
+            if (autoSmeltLevel > 0) AutoSmelting.onBlockBreak(event)
+
+            // If the event was not cancelled by AutoSmelting, break the block naturally
+            if (!event.isCancelled) cubeBlock.breakNaturally()
         }
     }
 

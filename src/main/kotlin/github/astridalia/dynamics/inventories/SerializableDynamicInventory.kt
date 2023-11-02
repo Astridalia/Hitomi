@@ -1,4 +1,4 @@
-package github.astridalia.dynamics
+package github.astridalia.dynamics.inventories
 
 import kotlinx.serialization.Serializable
 import org.bukkit.event.inventory.InventoryType

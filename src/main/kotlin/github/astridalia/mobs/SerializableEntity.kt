@@ -1,6 +1,6 @@
 package github.astridalia.mobs
 
-import com.mineinabyss.idofront.serialization.LocationSerializer
+import github.astridalia.modules.serializers.LocationSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Location

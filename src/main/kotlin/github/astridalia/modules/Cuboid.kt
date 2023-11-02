@@ -1,7 +1,7 @@
 package github.astridalia.modules
 
-import com.mineinabyss.idofront.serialization.VectorSerializer
-import com.mineinabyss.idofront.serialization.WorldSerializer
+import github.astridalia.modules.serializers.VectorSerializer
+import github.astridalia.modules.serializers.WorldSerializer
 import kotlinx.serialization.Serializable
 import org.bukkit.Location
 import org.bukkit.World

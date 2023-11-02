@@ -2,12 +2,15 @@ package github.astridalia.dynamics.inventories
 
 import github.astridalia.dynamics.CustomDynamicActions
 import github.astridalia.dynamics.items.IGUIActionItem
+import github.astridalia.modules.serializers.MaterialSerializer
 import kotlinx.serialization.Serializable
+import org.bukkit.Material
 
 
 @Serializable
 data class SerializableDynamicInventoryItem(
-    override var type: String,
+    @Serializable(with = MaterialSerializer::class)
+    override var type: Material,
     override var name: String,
     override var lore: MutableList<String> = mutableListOf(),
     override var data: MutableMap<String, String> = mutableMapOf(),

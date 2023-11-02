@@ -8,7 +8,7 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
 
 interface IItemComponent {
-    var type: String
+    var type: Material
     var name: String
     var lore: MutableList<String>
     var data: MutableMap<String, String>
@@ -32,8 +32,7 @@ interface IItemComponent {
     }
 
     fun toItemStack(amount: Int = 1): ItemStack {
-        val material = Material.matchMaterial(type) ?: Material.STONE
-        val itemStack = ItemStack(material, amount)
+        val itemStack = ItemStack(type, amount)
         itemStack.setItemMeta(itemStack.itemMeta?.apply {
             setDisplayName(name)
             lore = this@IItemComponent.lore

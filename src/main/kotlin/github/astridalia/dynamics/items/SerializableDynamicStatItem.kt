@@ -1,14 +1,20 @@
 package github.astridalia.dynamics.items
 
 import github.astridalia.dynamics.DynamicStats
+import github.astridalia.modules.serializers.MaterialSerializer
+import kotlinx.serialization.Serializable
+import org.bukkit.Material
 
+
+@Serializable
 data class SerializableDynamicStatItem(
     override var strength: Int = 0,
     override var intellect: Int = 0,
     override var agility: Int = 0,
     override var will: Int = 0,
     override var power: Int = 0,
-    override var type: String,
+    @Serializable(with = MaterialSerializer::class)
+    override var type: Material,
     override var name: String,
     override var lore: MutableList<String> = mutableListOf(),
     override var data: MutableMap<String, String> = mutableMapOf(

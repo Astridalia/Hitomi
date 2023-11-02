@@ -1,7 +1,7 @@
 package github.astridalia.dynamics.inventories.chests
 
-import com.mineinabyss.idofront.serialization.LocationSerializer
 import github.astridalia.dynamics.inventories.SerializableDynamicInventoryItem
+import github.astridalia.modules.serializers.LocationSerializer
 import kotlinx.serialization.Serializable
 import org.bukkit.Location
 import org.bukkit.event.inventory.InventoryType

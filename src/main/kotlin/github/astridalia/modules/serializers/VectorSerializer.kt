@@ -1,21 +1,34 @@
 package github.astridalia.modules.serializers
 
-import github.astridalia.modules.models.VectorSurrogate
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.bukkit.util.Vector
 
 object VectorSerializer : KSerializer<Vector> {
-    override val descriptor: SerialDescriptor = VectorSurrogate.serializer().descriptor
-
-    override fun serialize(encoder: Encoder, value: Vector) {
-        encoder.encodeSerializableValue(VectorSurrogate.serializer(), VectorSurrogate(value))
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("vector") {
+        element<Double>("x")
+        element<Double>("y")
+        element<Double>("z")
     }
 
     override fun deserialize(decoder: Decoder): Vector {
-        val surrogate = decoder.decodeSerializableValue(VectorSurrogate.serializer())
-        return Vector(surrogate.x, surrogate.y, surrogate.z)
+        val input = decoder.beginStructure(descriptor)
+        val x = input.decodeDoubleElement(descriptor, 0)
+        val y = input.decodeDoubleElement(descriptor, 1)
+        val z = input.decodeDoubleElement(descriptor, 2)
+        input.endStructure(descriptor)
+        return Vector(x, y, z)
+    }
+
+    override fun serialize(encoder: Encoder, value: Vector) {
+        val output = encoder.beginStructure(descriptor)
+        output.encodeDoubleElement(descriptor, 0, value.x)
+        output.encodeDoubleElement(descriptor, 1, value.y)
+        output.encodeDoubleElement(descriptor, 2, value.z)
+        output.endStructure(descriptor)
     }
 }

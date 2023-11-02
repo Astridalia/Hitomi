@@ -6,6 +6,7 @@ import github.astridalia.database.RedisCache
 import github.astridalia.dynamics.items.SerializableDynamicItem
 import github.astridalia.dynamics.items.enchantments.SerializableEnchant
 import github.astridalia.events.MathCalculations.calculateStatsBetweenAttackerAndDefender
+import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -67,7 +68,7 @@ class TestItemsListener : Listener, KoinComponent {
         val stringId = StringId<SerializableDynamicItem>("test")
         val item = dynamicItem.get(stringId) ?: run {
             val itemEntity = SerializableDynamicItem(
-                type = "DIAMOND_SWORD",
+                type = Material.DIAMOND_SWORD,
                 name = "test_item",
                 lore = mutableListOf(),
                 model = 0

@@ -1,10 +1,10 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    val kotlin_version = "1.9.10"
-    kotlin("jvm") version kotlin_version
+    val kotlinVersion = "1.9.10"
+    kotlin("jvm") version kotlinVersion
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    kotlin("plugin.serialization") version kotlin_version
+    kotlin("plugin.serialization") version kotlinVersion
 }
 
 group = "github.astridalia"
@@ -16,7 +16,6 @@ repositories {
     maven("https://repo.aikar.co/content/groups/aikar/")
     maven("https://hub.spigotmc.org/nexus/content/groups/public/")
     maven("https://oss.sonatype.org/content/groups/public/")
-    maven("https://repo.mineinabyss.com/releases")
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
 }
 
@@ -29,9 +28,6 @@ dependencies {
     implementation("org.reflections:reflections:0.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
-    implementation("com.mineinabyss:idofront-serializers:0.18.24")
-    implementation("org.json:json:20230618")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation("redis.clients:jedis:3.8.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.5")

@@ -2,6 +2,7 @@ package github.astridalia.dynamics.inventories
 
 import github.astridalia.dynamics.CustomDynamicActions
 import github.astridalia.dynamics.items.IGUIActionItem
+import github.astridalia.modules.serializers.InventoryActionSerializer
 import github.astridalia.modules.serializers.MaterialSerializer
 import kotlinx.serialization.Serializable
 import org.bukkit.Material

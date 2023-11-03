@@ -1,4 +1,4 @@
-package github.astridalia.dynamics.inventories
+package github.astridalia.modules.serializers
 
 import github.astridalia.dynamics.CustomDynamicActions
 import kotlinx.serialization.KSerializer

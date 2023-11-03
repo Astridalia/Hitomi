@@ -19,7 +19,11 @@ class TestItemsListener : Listener, KoinComponent {
 
     private fun calculateEventDamage(e: EntityDamageByEntityEvent): Double? {
         val attackerProfile = getProfileForEntity(e.damager) ?: return null
-        val defenderProfile = getProfileForEntity(e.entity) ?: return null
+        val defenderProfile = getProfileForEntity(e.entity) ?: Profile(
+            e.entity.uniqueId.toString(), CharacterStats(
+                strength = 25,
+            )
+        )
         val calculateStatsBetweenAttackerAndDefender =
             calculateStatsBetweenAttackerAndDefender(attackerProfile, defenderProfile)
         val (attackerStats, defenderStats) = calculateStatsBetweenAttackerAndDefender
@@ -77,6 +81,7 @@ class TestItemsListener : Listener, KoinComponent {
             itemEntity
         }
         player.inventory.addItem(item.toItemStack())
+
     }
 
 

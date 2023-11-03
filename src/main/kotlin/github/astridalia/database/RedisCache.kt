@@ -8,11 +8,15 @@ import redis.clients.jedis.JedisPool
 import redis.clients.jedis.JedisPoolConfig
 
 class RedisCache<T : Any>(
-    private val clazz: Class<T>,
+    private val entityClass: Class<T>,
     private val cacheExpirationMinutes: Long = 60,
-) : Storage<T>, MongoDBStorage<T>(clazz) {
+) : Storage<T>, MongoDBStorage<T>(entityClass) {
 
-    private val jedisPool = JedisPool(JedisPoolConfig(), "localhost")
+    companion object {
+        private const val REDIS_HOST = "localhost"
+    }
+
+    private val jedisPool = JedisPool(JedisPoolConfig(), REDIS_HOST)
     private val objectMapper = jacksonObjectMapper()
 
     override fun insertOrUpdate(id: Id<T>, entity: T) {
@@ -34,8 +38,8 @@ class RedisCache<T : Any>(
         return StringId(hashing.toString())
     }
 
-    private fun getCache(id: Id<T>): T? = jedisPool.resource.use {
-        it.get(id.toHash().id)?.let { deserialize(it, clazz) }
+    private fun getCache(id: Id<T>): T? = jedisPool.resource.use { it ->
+        it.get(id.toHash().id)?.let { deserialize(it) }
     }
 
     private fun setCache(id: Id<T>, entity: T) {
@@ -50,5 +54,10 @@ class RedisCache<T : Any>(
 
     private fun serialize(entity: T): String = objectMapper.writeValueAsString(entity)
 
-    private fun deserialize(data: String, clazz: Class<T>): T? = objectMapper.readValue(data, clazz)
+    private fun deserialize(data: String): T? = try {
+        objectMapper.readValue(data, entityClass)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
 }

@@ -18,7 +18,7 @@ import org.litote.kmongo.id.StringId
 object HitomiCommands : BaseCommand() {
     @CommandAlias("enchant")
     @CommandPermission("hitomi.enchanting.enchant")
-    fun enchant(enchantment: String, level: Int, player: Player) {
+    fun enchant(enchantment: String, player: Player) {
         val enchantmentMatches = SerializableEnchant.matches(enchantment.replace("\\s+".toRegex(), "_"))
         if (enchantmentMatches == null) {
             player.sendMessage("Enchantment doesn't exist!")
@@ -28,6 +28,31 @@ object HitomiCommands : BaseCommand() {
         itemInUse.enchantOf(enchantmentMatches)
         player.inventory.setItemInMainHand(itemInUse)
         player.sendMessage("Enchanted item in hand.")
+    }
+
+    @CommandAlias("fly|flight")
+    @CommandPermission("hitomi.mod")
+    fun fly(player: Player) {
+        player.isFlying = !player.isFlying
+        player.sendMessage("Flight set to ${!player.isFlying}.")
+    }
+
+    @CommandAlias("speed")
+    @CommandPermission("hitomi.mod")
+    fun speed(walk: Float, player: Player) {
+        if (walk > 1f || walk < -1f) {
+            player.sendMessage("Speed value must be between -1 and 1.")
+            return
+        }
+        if (walk == 0.2f) {
+            player.walkSpeed = 0.2f
+            player.flySpeed = 0.1f
+            player.sendMessage("Set speed to default.")
+            return
+        }
+        player.walkSpeed = walk
+        player.flySpeed = walk
+        player.sendMessage("Set speed to $walk.")
     }
 
     @CommandAlias("item")

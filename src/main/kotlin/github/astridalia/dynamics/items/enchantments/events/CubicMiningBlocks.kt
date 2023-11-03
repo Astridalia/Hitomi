@@ -19,13 +19,15 @@ import org.koin.core.component.KoinComponent
 import org.koin.java.KoinJavaComponent.inject
 
 object CubicMiningBlocks : KoinComponent, Listener {
+    private const val `ROCK SHAPER_ENCHANT_NAME` = "Rockshaper"
+    private val scope = CoroutineScope(Dispatchers.Default)
+
     private val javaPlugin: JavaPlugin by inject(JavaPlugin::class.java)
     private val customEnchant = SerializableEnchant(
-        "Exploding_Mine",
+        `ROCK SHAPER_ENCHANT_NAME`,
         level = 1,
-        description = "Mines blocks around 3x3 area."
+        description = "Grants the ability to manipulate stone and terrain, aiding in tunneling and construction"
     )
-    private val scope = CoroutineScope(Dispatchers.Default)
 
     private val unbreakableMaterials = setOf(
         Material.BEDROCK, Material.BARRIER, Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK,
@@ -34,25 +36,29 @@ object CubicMiningBlocks : KoinComponent, Listener {
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        val player = event.player
-        val block = event.block
+        try {
+            val player = event.player
+            val block = event.block
 
-        // Check if the player has the Cubic Mining enchantment
-        val itemInMainHand = player.inventory.itemInMainHand
-        val cubicMiningLevel = itemInMainHand.getEnchantOf(customEnchant) ?: 0
-        if (cubicMiningLevel <= 0) return
+            // Check if the player has the Cubic Mining enchantment
+            val itemInMainHand = player.inventory.itemInMainHand
+            val cubicMiningLevel = itemInMainHand.getEnchantOf(customEnchant)
+            if (cubicMiningLevel <= 0) return
 
-        // Check if the player has the Auto Smelting enchantment
-        val autoSmeltLevel = itemInMainHand.getEnchantOf(AutoSmelting.customEnchant) ?: 0
-        if (autoSmeltLevel > 0) AutoSmelting.onBlockBreak(event)
+            // Check if the player has the Auto Smelting enchantment
+            val autoSmeltLevel = itemInMainHand.getEnchantOf(AutoSmelting.customEnchant)
+            if (autoSmeltLevel > 0) AutoSmelting.onBlockBreak(event)
 
-        val cubeBlocks = getCubicBlocks(block)
+            val cubeBlocks = getCubicBlocks(block)
 
-        // Delay the execution of breakCubicBlocks
-        scope.launch {
-            Bukkit.getScheduler().runTask(javaPlugin, Runnable { // Switch back to the main thread
-                breakCubicBlocks(player, cubeBlocks)
-            })
+            // Delay the execution of breakCubicBlocks
+            scope.launch {
+                Bukkit.getScheduler().runTask(javaPlugin, Runnable { // Switch back to the main thread
+                    breakCubicBlocks(player, cubeBlocks)
+                })
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

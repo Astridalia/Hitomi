@@ -8,9 +8,10 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 
 object AutoSmelting : Listener {
-    val customEnchant = SerializableEnchant("AutoSmelting", level = 1)
+    private const val AUTO_SMELTING_ENCHANT_NAME = "AutoSmelting"
+    val customEnchant = SerializableEnchant(AUTO_SMELTING_ENCHANT_NAME, level = 1)
 
-    private val smelts = mutableMapOf(
+    private val smeltableMaterials = mutableMapOf(
         Material.IRON_ORE to Material.IRON_INGOT,
         Material.GOLD_ORE to Material.GOLD_INGOT,
         Material.COPPER_ORE to Material.COPPER_INGOT,
@@ -27,14 +28,18 @@ object AutoSmelting : Listener {
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        val player = event.player
-        val itemInMainHand = player.inventory.itemInMainHand
-        val autoSmelt = itemInMainHand.getEnchantOf(customEnchant) ?: 0
-        if (autoSmelt <= 0) return
-        smelts[event.block.type]?.let { smelted ->
-            event.isCancelled = true
-            event.block.type = Material.AIR
-            event.block.world.dropItemNaturally(event.block.location, smelted.asItemStack())
+        try {
+            val player = event.player
+            val itemInMainHand = player.inventory.itemInMainHand
+            val autoSmelt = itemInMainHand.getEnchantOf(customEnchant)
+            if (autoSmelt <= 0) return
+            smeltableMaterials[event.block.type]?.let { smelted ->
+                event.isCancelled = true
+                event.block.type = Material.AIR
+                event.block.world.dropItemNaturally(event.block.location, smelted.asItemStack())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

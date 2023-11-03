@@ -11,13 +11,17 @@ import org.litote.kmongo.findOneById
 import org.litote.kmongo.updateOneById
 import java.util.*
 
-open class MongoDBStorage<T : Any>(private val clazz: Class<T>) : Storage<T> {
-    private val collection by lazy {
-        val database = MongoManager.mongodbClient.getDatabase("Hitomi")
-        database.getCollection(collectionName, clazz)
+open class MongoDBStorage<T : Any>(private val entityClass: Class<T>) : Storage<T> {
+    companion object {
+        private const val DATABASE_NAME = "Hitomi"
     }
 
-    protected val collectionName: String = clazz.simpleName.lowercase(Locale.getDefault())
+    private val collection by lazy {
+        val database = MongoManager.mongodbClient.getDatabase(DATABASE_NAME)
+        database.getCollection(collectionName, entityClass)
+    }
+
+    protected val collectionName: String = entityClass.simpleName.lowercase(Locale.getDefault())
 
     override fun insertOrUpdate(id: Id<T>, entity: T) {
         collection.updateOneById(id, entity, UpdateOptions().upsert(true))
@@ -33,12 +37,16 @@ open class MongoDBStorage<T : Any>(private val clazz: Class<T>) : Storage<T> {
 
     override fun listenForChanges(onChange: (ChangeStreamDocument<T>) -> Unit) {
         Thread {
-            val changeStream = collection.watch(clazz)
-            val iterator = changeStream.iterator()
-            while (iterator.hasNext()) {
-                val change = iterator.next()
-                val javaPlugin = JavaPlugin.getProvidingPlugin(HitomiPlugin::class.java)
-                Bukkit.getScheduler().runTask(javaPlugin, Runnable { onChange(change) })
+            try {
+                val changeStream = collection.watch(entityClass)
+                val iterator = changeStream.iterator()
+                while (iterator.hasNext()) {
+                    val change = iterator.next()
+                    val javaPlugin = JavaPlugin.getProvidingPlugin(HitomiPlugin::class.java)
+                    Bukkit.getScheduler().runTask(javaPlugin, Runnable { onChange(change) })
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }.start()
     }

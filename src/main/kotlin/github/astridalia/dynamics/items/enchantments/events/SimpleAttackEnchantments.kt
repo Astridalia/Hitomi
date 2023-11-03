@@ -20,11 +20,11 @@ object SimpleAttackEnchantments : Listener, KoinComponent {
         val player = e.damager as? Player ?: return
         val item = player.itemInHand
 
-        item.getEnchantOf(SerializableEnchant("Charged", level = 1))?.let { charged ->
+        item.getEnchantOf(SerializableEnchant("Charged", level = 1)).let { charged ->
             if (charged > 0) e.entity.location.world?.spawn(e.entity.location, LightningStrike::class.java)
         }
 
-        item.getEnchantOf(SerializableEnchant("Fiery", level = 1))?.let { fiery ->
+        item.getEnchantOf(SerializableEnchant("Fiery", level = 1)).let { fiery ->
             if (fiery > 0) e.entity.fireTicks = (500L * fiery).toInt()
         }
     }
@@ -33,7 +33,7 @@ object SimpleAttackEnchantments : Listener, KoinComponent {
     fun onInteractCloaking(e: PlayerInteractEvent) {
         val item = e.item ?: return
 
-        item.getEnchantOf(SerializableEnchant("Cloaking", level = 1))?.let { cloaking ->
+        item.getEnchantOf(SerializableEnchant("Cloaking", level = 1)).let { cloaking ->
             when (e.action) {
                 Action.RIGHT_CLICK_AIR, Action.LEFT_CLICK_AIR -> {
                     if (cloaking > 0) {

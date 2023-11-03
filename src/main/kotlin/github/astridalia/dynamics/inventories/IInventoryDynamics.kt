@@ -2,7 +2,6 @@ package github.astridalia.dynamics.inventories
 
 import github.astridalia.dynamics.CustomDynamicActions
 import github.astridalia.dynamics.items.IGUIActionItem
-import github.astridalia.dynamics.items.SerializableDynamicItem
 
 interface IInventoryDynamics {
     var title: String
@@ -12,22 +11,16 @@ interface IInventoryDynamics {
 
     fun toBukkitInventory(): org.bukkit.inventory.Inventory {
         val inventory = org.bukkit.Bukkit.createInventory(null, size, title)
-        items.forEach { (slot, item) ->
-            inventory.setItem(
-                slot, SerializableDynamicItem(
-                    type = item.type,
-                    name = item.name,
-                    lore = item.lore,
-                    data = item.data,
-                    model = item.model
-                ).toItemStack()
-            )
-        }
+        items.forEach { (slot, item) -> inventory.setItem(slot, item.toItemStack()) }
         return inventory
     }
 
     fun open(player: org.bukkit.entity.Player) {
         player.openInventory(toBukkitInventory())
+    }
+
+    fun setItem(slot: Int, item: SerializableDynamicInventoryItem) {
+        items[slot] = item
     }
 
     fun setItem(
@@ -42,10 +35,6 @@ interface IInventoryDynamics {
         items.remove(slot)
     }
 
-    fun setItem(slot: Int, item: SerializableDynamicInventoryItem) {
-        items[slot] = item
-    }
-
     fun getAction(slot: Int): CustomDynamicActions? {
         return items[slot]?.action
     }
@@ -53,5 +42,4 @@ interface IInventoryDynamics {
     fun getItemAction(slot: Int): IGUIActionItem? {
         return items[slot]
     }
-
 }

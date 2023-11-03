@@ -14,34 +14,42 @@ import org.bukkit.event.entity.ProjectileHitEvent
 import org.koin.core.component.KoinComponent
 
 object ExplodingArrow : Listener, KoinComponent {
-    private const val power = 2.5f
+    private const val EXPLOSION_POWER = 2.5f
+    private const val EXPLODING_ARROWS_ENCHANT_NAME = "Exploding_Arrows"
     private val arrowShooters: MutableMap<Arrow, Player> = HashMap()
-
-    private val customEnchant = SerializableEnchant("Exploding_Arrows", level = 1)
+    private val customEnchant = SerializableEnchant(EXPLODING_ARROWS_ENCHANT_NAME, level = 1)
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onEntityShootBowEvent(event: EntityShootBowEvent) {
-        val shooter = event.entity as? Player ?: return
-        val bow = event.bow ?: return
+        try {
+            val shooter = event.entity as? Player ?: return
+            val bow = event.bow ?: return
 
-        bow.getEnchantOf(customEnchant)?.let { enchantment ->
-            if (enchantment > 0) {
-                (event.projectile as? Arrow)?.let { arrow ->
-                    arrowShooters[arrow] = shooter
+            bow.getEnchantOf(customEnchant).let { enchantment ->
+                if (enchantment > 0) {
+                    (event.projectile as? Arrow)?.let { arrow ->
+                        arrowShooters[arrow] = shooter
+                    }
                 }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onProjectileHit(event: ProjectileHitEvent) {
-        val arrow = event.entity as? Arrow ?: return
-        val shooter = arrowShooters.remove(arrow) ?: return
+        try {
+            val arrow = event.entity as? Arrow ?: return
+            val shooter = arrowShooters.remove(arrow) ?: return
 
-        shooter.inventory.itemInMainHand.getEnchantOf(customEnchant)?.let { explodingLevel ->
-            if (explodingLevel > 0) {
-                explodeArrow(arrow, power * explodingLevel)
+            shooter.inventory.itemInMainHand.getEnchantOf(customEnchant).let { explodingLevel ->
+                if (explodingLevel > 0) {
+                    explodeArrow(arrow, EXPLOSION_POWER * explodingLevel)
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

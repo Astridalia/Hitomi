@@ -10,5 +10,5 @@ interface DynamicStats {
     var power: Int
 
 
-    var EquipmentSet: MutableSet<SerializableDynamicStatItem>
+    var dynamicStatItemMutableSet: MutableSet<SerializableDynamicStatItem>
 }

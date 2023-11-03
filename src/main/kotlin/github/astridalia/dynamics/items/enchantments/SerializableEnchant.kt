@@ -4,7 +4,9 @@ import github.astridalia.HitomiPlugin
 import github.astridalia.database.RedisCache
 import github.astridalia.inventory.toRoman
 import github.astridalia.items.PersistentData
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.bson.codecs.pojo.annotations.BsonId
 import org.bukkit.ChatColor
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
@@ -18,7 +20,7 @@ import java.util.*
 
 @Serializable
 data class SerializableEnchant(
-    override var name: String,
+    @BsonId @SerialName("_id") override var name: String,
     override var description: String = "",
     override var level: Int,
     override var maxLevel: Int = 5,

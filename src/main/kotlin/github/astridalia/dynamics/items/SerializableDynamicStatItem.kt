@@ -2,7 +2,9 @@ package github.astridalia.dynamics.items
 
 import github.astridalia.dynamics.DynamicStats
 import github.astridalia.modules.serializers.MaterialSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.bson.codecs.pojo.annotations.BsonId
 import org.bukkit.Material
 
 
@@ -15,7 +17,7 @@ data class SerializableDynamicStatItem(
     override var power: Int = 0,
     @Serializable(with = MaterialSerializer::class)
     override var type: Material,
-    override var name: String,
+    @BsonId @SerialName("_id") override var name: String,
     override var lore: MutableList<String> = mutableListOf(),
     override var data: MutableMap<String, String> = mutableMapOf(
         "DateGeneratedBy" to "${System.currentTimeMillis()}",
@@ -26,5 +28,5 @@ data class SerializableDynamicStatItem(
         "strength" to "$strength",
     ),
     override var model: Int = 0,
-    override var EquipmentSet: MutableSet<SerializableDynamicStatItem> = mutableSetOf()
+    override var dynamicStatItemMutableSet: MutableSet<SerializableDynamicStatItem> = mutableSetOf()
 ) : IItemComponent, DynamicStats

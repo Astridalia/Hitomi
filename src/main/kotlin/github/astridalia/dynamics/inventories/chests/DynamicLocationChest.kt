@@ -2,7 +2,9 @@ package github.astridalia.dynamics.inventories.chests
 
 import github.astridalia.dynamics.inventories.SerializableDynamicInventoryItem
 import github.astridalia.modules.serializers.LocationSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.bson.codecs.pojo.annotations.BsonId
 import org.bukkit.Location
 import org.bukkit.event.inventory.InventoryType
 
@@ -12,7 +14,7 @@ data class DynamicLocationChest(
     override var location: Location,
     override var cooldown: Long = 0L,
     override var lastOpened: Long = 0L,
-    override var title: String = "Tier #1",
+    @BsonId @SerialName("_id") override var title: String = "Tier #1",
     override var size: Int = InventoryType.CHEST.defaultSize,
     override var items: MutableMap<Int, SerializableDynamicInventoryItem> = mutableMapOf(),
     override var isCancelled: Boolean = false,

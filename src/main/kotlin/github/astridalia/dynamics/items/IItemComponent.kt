@@ -1,8 +1,13 @@
 package github.astridalia.dynamics.items
 
 import github.astridalia.HitomiPlugin
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant.Companion.enchantOf
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant.Companion.getEnchantOf
+import github.astridalia.dynamics.items.enchantments.SerializableEnchant.Companion.setEnchantOf
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
@@ -31,6 +36,8 @@ interface IItemComponent {
         data.remove(key)
     }
 
+
+
     fun toItemStack(amount: Int = 1): ItemStack {
         val itemStack = ItemStack(type, amount)
         itemStack.setItemMeta(itemStack.itemMeta?.apply {
@@ -40,7 +47,17 @@ interface IItemComponent {
             isUnbreakable = true
             data.forEach { (k, v) ->
                 val namespaceKey = namespaceKey(k)
-                persistentDataContainer.set(namespaceKey, PersistentDataType.STRING, v)
+                if (v.toIntOrNull() != null) {
+                    // If 'v' is an integer, set it as an integer
+                    persistentDataContainer.set(namespaceKey, PersistentDataType.INTEGER, v.toInt())
+                } else {
+                    val enchantment = SerializableEnchant.matches(k)
+                    if (enchantment != null) {
+                        // If 'v' is not an integer, treat it as an enchantment level (default to 1 if not a valid integer)
+                        val level = v.toIntOrNull() ?: 1
+                        itemStack.setEnchantOf(enchantment, level)
+                    }
+                }
             }
         })
         return itemStack

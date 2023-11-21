@@ -10,9 +10,9 @@ interface IInventoryDynamics {
     var isCancelled: Boolean
 
     fun toBukkitInventory(): org.bukkit.inventory.Inventory {
-        val inventory = org.bukkit.Bukkit.createInventory(null, size, title)
-        items.forEach { (slot, item) -> inventory.setItem(slot, item.toItemStack()) }
-        return inventory
+        return org.bukkit.Bukkit.createInventory(null, size, title).apply {
+            items.forEach { (slot, item) -> setItem(slot, item.toItemStack()) }
+        }
     }
 
     fun open(player: org.bukkit.entity.Player) {

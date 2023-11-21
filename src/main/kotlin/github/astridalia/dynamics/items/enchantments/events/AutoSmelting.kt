@@ -28,18 +28,12 @@ object AutoSmelting : Listener {
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        try {
-            val player = event.player
-            val itemInMainHand = player.inventory.itemInMainHand
-            val autoSmelt = itemInMainHand.getEnchantOf(customEnchant)
-            if (autoSmelt <= 0) return
+        checkAndExecuteEnchantment(event.player.inventory.itemInMainHand, event.player, AUTO_SMELTING_ENCHANT_NAME) { _, _ ->
             smeltableMaterials[event.block.type]?.let { smelted ->
                 event.isCancelled = true
                 event.block.type = Material.AIR
                 event.block.world.dropItemNaturally(event.block.location, smelted.asItemStack())
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 }

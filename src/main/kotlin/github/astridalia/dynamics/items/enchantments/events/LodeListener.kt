@@ -1,10 +1,10 @@
 package github.astridalia.dynamics.items.enchantments.events
 
 import github.astridalia.dynamics.items.enchantments.SerializableEnchant
-import github.astridalia.dynamics.items.enchantments.SerializableEnchant.Companion.getEnchantOf
 import org.bukkit.Color.RED
 import org.bukkit.Material
 import org.bukkit.Particle
+import org.bukkit.Particle.DustOptions
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -25,17 +25,16 @@ object LodeListener : Listener {
     fun onPlayerInteract(e: PlayerInteractEvent) {
         val player = e.player
         val itemInMainHand = player.inventory.itemInMainHand
-        val lodeLevel = itemInMainHand.getEnchantOf(lodeListener)
-        if (lodeLevel <= 0) return
-
-        checkForValuableResources(player, 10.0, 5.0)
+        checkAndExecuteEnchantment(itemInMainHand, player, lodeListener.name) { _, level ->
+            checkForValuableResources(player, 10.0 * level, 5.0 * level)
+        }
     }
 
-    fun checkForValuableResources(player: Player, radius: Double, distanceForSound: Double) {
+    private fun checkForValuableResources(player: Player, radius: Double, distanceForSound: Double) {
         val world = player.world
         val playerLocation = player.location
 
-        for (degree in 0..<360) {
+        for (degree in 0 until 360) {
             val radian = Math.toRadians(degree.toDouble())
             val dx = (cos(radian) * radius).roundToInt()
             val dz = (sin(radian) * radius).roundToInt()
@@ -47,11 +46,11 @@ object LodeListener : Listener {
                 // Draw a line to the block
                 player.spawnParticle(
                     Particle.REDSTONE,
-                    blockLocation.x,
-                    blockLocation.y,
-                    blockLocation.z,
+                    blockLocation.x + 0.5,
+                    blockLocation.y + 0.5,
+                    blockLocation.z + 0.5,
                     1,
-                    Particle.DustOptions(RED, 1f)
+                    DustOptions(RED, 1f)
                 )
 
                 // Play a sound if the player is within a certain distance
@@ -62,5 +61,9 @@ object LodeListener : Listener {
         }
     }
 
-    val valuableResources = setOf(Material.DIAMOND_ORE, Material.GOLD_ORE, Material.IRON_ORE)
+    val valuableResources = setOf(
+        Material.DIAMOND_ORE,
+        Material.GOLD_ORE,
+        Material.IRON_ORE
+    )
 }

@@ -3,7 +3,6 @@ package github.astridalia.dynamics.items.enchantments
 import github.astridalia.HitomiPlugin
 import github.astridalia.database.RedisCache
 import github.astridalia.inventory.toRoman
-import github.astridalia.items.PersistentData
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bson.codecs.pojo.annotations.BsonId
@@ -22,7 +21,7 @@ import java.util.*
 data class SerializableEnchant(
     @BsonId @SerialName("_id") override var name: String,
     override var description: String = "",
-    override var level: Int,
+    override var level: Int = 1,
     override var maxLevel: Int = 5,
     override var applicableMaterials: MutableList<String> = mutableListOf(),
     override var display: String = String.format(
@@ -32,12 +31,13 @@ data class SerializableEnchant(
     ).toColor()
 ) : IEnchant {
 
-
     fun ItemStack.isApplicable(): Boolean = applicableMaterials.contains(this.type.name)
 
     companion object {
         private val enchantmentNameRegex = Regex("^hitomiplugin:", RegexOption.IGNORE_CASE)
+
         fun String.toColor(): String = ChatColor.translateAlternateColorCodes('&', this)
+
         fun matches(name: String): SerializableEnchant? {
             val formattedName = enchantmentNameRegex.replace(name.lowercase(Locale.getDefault()), "")
             return RedisCache(SerializableEnchant::class.java).get(
@@ -51,67 +51,48 @@ data class SerializableEnchant(
         }
 
         fun createLoreString(enchantName: String, level: Int): String {
-            val humanReadableName = enchantName.replace("_", " ").split(" ").joinToString(" ") { it.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(
-                    Locale.getDefault()
-                ) else it.toString()
-            } }
+            val humanReadableName = enchantName.replace("_", " ").split(" ").joinToString(" ") {
+                it.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
+            }
             return String.format("%s%s %s%s", ChatColor.DARK_AQUA, humanReadableName, ChatColor.BLUE, level.toRoman())
         }
 
         fun ItemStack.enchantOf(customEnchant: SerializableEnchant): Int {
-            val itemMeta = itemMeta ?: return 0
-            val dataContainer = itemMeta.persistentDataContainer
-            val persistentData = PersistentData(dataContainer, PersistentDataType.INTEGER)
-            val data = persistentData[customEnchant.name] ?: 0
-
-            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true)
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
-
+            val data = getEnchantOf(customEnchant)
             val newLevel = data + customEnchant.level
-            persistentData[customEnchant.name] = newLevel
-            val loreToAdd = createLoreString(customEnchant.name, newLevel)
-            val loreToRemove = createLoreString(customEnchant.name, data)
-            itemMeta.lore = (itemMeta.lore ?: mutableListOf()) - loreToRemove + loreToAdd
-
-            this.setItemMeta(itemMeta)
-            return getEnchantOf(customEnchant) ?: getOrDefault(customEnchant)
+            this.setItemMeta(itemMeta?.apply {
+                addEnchant(Enchantment.DURABILITY, 1, true)
+                addItemFlags(ItemFlag.HIDE_ENCHANTS)
+                val loreToAdd = createLoreString(customEnchant.name, newLevel)
+                val loreToRemove = createLoreString(customEnchant.name, data)
+                lore = (lore ?: mutableListOf()) - loreToRemove + loreToAdd
+            })
+            setEnchantOf(customEnchant, newLevel)
+            return data
         }
 
-        private fun namespaceKey(str: String): NamespacedKey {
-            val javaPlugin = JavaPlugin.getProvidingPlugin(HitomiPlugin::class.java)
-            return NamespacedKey(javaPlugin, str)
-        }
-
-        fun ItemStack.getEnchantOf(enchant: IEnchant): Int {
-            val persistentDataContainer = this.itemMeta?.persistentDataContainer
-            return persistentDataContainer?.get(namespaceKey(enchant.name), PersistentDataType.INTEGER) ?: 0
-        }
+        fun ItemStack.getEnchantOf(enchant: IEnchant): Int =
+            itemMeta?.persistentDataContainer?.get(namespaceKey(enchant.name), PersistentDataType.INTEGER) ?: 0
 
         fun ItemStack.removeEnchantOf(enchant: IEnchant) {
-            val persistentDataContainer = this.itemMeta?.persistentDataContainer
-            this.setItemMeta(this.itemMeta?.apply {
-                this.removeEnchant(Enchantment.DURABILITY)
-                persistentDataContainer?.remove(namespaceKey(enchant.name))
+            this.setItemMeta(itemMeta?.apply {
+                removeEnchant(Enchantment.DURABILITY)
+                persistentDataContainer.remove(namespaceKey(enchant.name))
             })
         }
 
-        fun ItemStack.setEnchantOf(enchant: IEnchant, level: Int) {
-            val persistentDataContainer = this.itemMeta?.persistentDataContainer
-            this.setItemMeta(this.itemMeta?.apply {
-                this.addEnchant(Enchantment.DURABILITY, 1, true)
-                this.addItemFlags(ItemFlag.HIDE_ENCHANTS)
-                persistentDataContainer?.set(namespaceKey(enchant.name), PersistentDataType.INTEGER, level)
+        fun ItemStack.setEnchantOf(enchant: IEnchant, level: Int=1) {
+            this.setItemMeta(itemMeta?.apply {
+                addEnchant(Enchantment.DURABILITY, 1, true)
+                addItemFlags(ItemFlag.HIDE_ENCHANTS)
+                persistentDataContainer.set(namespaceKey(enchant.name), PersistentDataType.INTEGER, level)
             })
         }
 
-        fun ItemStack.getOrDefault(enchant: IEnchant): Int {
-            val persistentDataContainer = this.itemMeta?.persistentDataContainer
-            val level = persistentDataContainer?.get(namespaceKey(enchant.name), PersistentDataType.INTEGER) ?: 0
-            this.setItemMeta(this.itemMeta?.apply {
-                persistentDataContainer?.set(namespaceKey(enchant.name), PersistentDataType.INTEGER, level)
-            })
-            return enchant.level
-        }
+
+        private fun namespaceKey(str: String): NamespacedKey =
+            NamespacedKey(JavaPlugin.getProvidingPlugin(HitomiPlugin::class.java), str)
     }
 }

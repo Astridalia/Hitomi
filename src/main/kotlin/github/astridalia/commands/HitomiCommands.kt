@@ -12,10 +12,23 @@ import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
 import org.litote.kmongo.id.StringId
 
-
 @CommandAlias("hitomi|hi")
 @CommandPermission("hitomi.commands")
 object HitomiCommands : BaseCommand() {
+
+    private fun <T : Any> getItemFromCache(id: String, cache: RedisCache<T>): T? {
+        val stringId = StringId<T>(id)
+        return cache.get(stringId)
+    }
+
+    private fun enchantItem(player: Player, enchantment: SerializableEnchant) {
+        val itemInUse = player.inventory.itemInMainHand
+        enchantment.level = 1
+        itemInUse.enchantOf(enchantment)
+        player.inventory.setItemInMainHand(itemInUse)
+        player.sendMessage("Enchanted item in hand.")
+    }
+
     @CommandAlias("enchant")
     @CommandPermission("hitomi.enchanting.enchant")
     fun enchant(enchantment: String, player: Player) {
@@ -24,10 +37,7 @@ object HitomiCommands : BaseCommand() {
             player.sendMessage("Enchantment doesn't exist!")
             return
         }
-        val itemInUse = player.inventory.itemInMainHand
-        itemInUse.enchantOf(enchantmentMatches)
-        player.inventory.setItemInMainHand(itemInUse)
-        player.sendMessage("Enchanted item in hand.")
+        enchantItem(player, enchantmentMatches)
     }
 
     @CommandAlias("fly|flight")
@@ -59,8 +69,7 @@ object HitomiCommands : BaseCommand() {
     @CommandPermission("hitomi.item")
     fun give(id: String, player: Player) {
         val cachedMongoDBStorage = RedisCache(SerializableDynamicItem::class.java)
-        val stringId = StringId<SerializableDynamicItem>(id)
-        val itemStack = cachedMongoDBStorage.get(stringId)
+        val itemStack = getItemFromCache(id, cachedMongoDBStorage)
         if (itemStack == null) {
             player.sendMessage("Item with ID $id not found.")
             return
@@ -79,7 +88,7 @@ object HitomiCommands : BaseCommand() {
     @CommandPermission("hitomi.admin")
     fun openInventory(inventory: String, player: Player) {
         val cachedMongoDBStorage = RedisCache(SerializableDynamicInventory::class.java)
-        val itemStack = cachedMongoDBStorage.get(StringId(inventory))
+        val itemStack = getItemFromCache(inventory, cachedMongoDBStorage)
         if (itemStack == null) {
             player.sendMessage("Inventory with ID $inventory not found.")
             return
@@ -103,6 +112,4 @@ object HitomiCommands : BaseCommand() {
         }
         player.sendMessage(message)
     }
-
-
 }

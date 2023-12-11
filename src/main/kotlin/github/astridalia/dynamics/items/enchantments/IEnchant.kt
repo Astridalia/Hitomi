@@ -7,6 +7,8 @@ interface IEnchant {
     var maxLevel: Int
     var applicableMaterials: MutableList<String>
 
+    var rarity: Double
+
     var display: String
 
 

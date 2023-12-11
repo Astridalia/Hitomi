@@ -8,6 +8,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bukkit.ChatColor
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
@@ -29,15 +30,28 @@ data class SerializableEnchant(
         "&5%s &a%s",
         name.uppercase(Locale.getDefault()).replace("_", " "),
         level.toRoman()
-    ).toColor()
+    ).toColor(), override var rarity: Double = 0.0
 ) : IEnchant {
 
 
-    fun ItemStack.isApplicable(): Boolean = applicableMaterials.contains(this.type.name)
 
     companion object {
         private val enchantmentNameRegex = Regex("^hitomiplugin:", RegexOption.IGNORE_CASE)
         fun String.toColor(): String = ChatColor.translateAlternateColorCodes('&', this)
+
+
+        fun random(): SerializableEnchant {
+            val enchantments = RedisCache(SerializableEnchant::class.java).getAll()
+            val totalRarity = enchantments.sumOf { it.rarity }
+            val random = Random().nextDouble() * totalRarity
+            var current = 0.0
+            for (enchantment in enchantments) {
+                current += enchantment.rarity
+                if (current > random) return enchantment
+            }
+            return enchantments.random()
+        }
+
         fun matches(name: String): SerializableEnchant? {
             val formattedName = enchantmentNameRegex.replace(name.lowercase(Locale.getDefault()), "")
             return RedisCache(SerializableEnchant::class.java).get(
@@ -66,7 +80,7 @@ data class SerializableEnchant(
             val data = persistentData[customEnchant.name] ?: 0
 
             itemMeta.addEnchant(Enchantment.DURABILITY, 1, true)
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+
 
             val newLevel = data + customEnchant.level
             persistentData[customEnchant.name] = newLevel

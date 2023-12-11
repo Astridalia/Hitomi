@@ -28,5 +28,6 @@ data class SerializableDynamicStatItem(
         "strength" to "$strength",
     ),
     override var model: Int = 0,
-    override var dynamicStatItemMutableSet: MutableSet<SerializableDynamicStatItem> = mutableSetOf()
+    override var dynamicStatItemMutableSet: MutableSet<SerializableDynamicStatItem> = mutableSetOf(),
+
 ) : IItemComponent, DynamicStats

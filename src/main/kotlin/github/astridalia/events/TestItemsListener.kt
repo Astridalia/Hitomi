@@ -1,57 +1,39 @@
 package github.astridalia.events
 
-import github.astridalia.character.CharacterStats
-import github.astridalia.character.Profile
 import github.astridalia.database.RedisCache
+import github.astridalia.dynamics.inventories.SerializableDynamicInventory
+import github.astridalia.dynamics.inventories.SerializableDynamicInventoryItem
 import github.astridalia.dynamics.items.SerializableDynamicItem
 import github.astridalia.dynamics.items.enchantments.SerializableEnchant
-import github.astridalia.events.MathCalculations.calculateStatsBetweenAttackerAndDefender
 import org.bukkit.Material
-import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.koin.core.component.KoinComponent
 import org.litote.kmongo.id.StringId
 
 class TestItemsListener : Listener, KoinComponent {
-
-    private fun calculateEventDamage(e: EntityDamageByEntityEvent): Double? {
-        val attackerProfile = getProfileForEntity(e.damager) ?: return null
-        val defenderProfile = getProfileForEntity(e.entity) ?: Profile(
-            e.entity.uniqueId.toString(), CharacterStats(
-                strength = 25,
-            )
-        )
-        val calculateStatsBetweenAttackerAndDefender =
-            calculateStatsBetweenAttackerAndDefender(attackerProfile, defenderProfile)
-        val (attackerStats, defenderStats) = calculateStatsBetweenAttackerAndDefender
-        return MathCalculations.calculateDamage(attackerStats, defenderStats)
-    }
-
-    @EventHandler
-    fun onDamageByEntity(e: EntityDamageByEntityEvent) {
-        e.damage = calculateEventDamage(e) ?: return
-    }
-
-    private fun getProfileForEntity(entity: Entity): Profile? {
-        val testStats = RedisCache(Profile::class.java)
-        return testStats.get(StringId(entity.uniqueId.toString()))
-    }
-
-
-
     @EventHandler
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
 
-        val testStats = RedisCache(Profile::class.java)
-        val playerIdString = StringId<Profile>(player.uniqueId.toString())
-        testStats.get(playerIdString) ?: run {
-            val itemEntity = Profile(player.uniqueId.toString(), CharacterStats())
-            testStats.insertOrUpdate(playerIdString, itemEntity)
-            itemEntity
+        val inventorySerialization = RedisCache(SerializableDynamicInventory::class.java)
+        val inventoryId = StringId<SerializableDynamicInventory>("test")
+        inventorySerialization.get(inventoryId) ?: run {
+            val inventoryEntity = SerializableDynamicInventory(
+                title = "test",
+                size = 9,
+                items = mutableMapOf(
+                    0 to SerializableDynamicInventoryItem(
+                        type = Material.DIAMOND_SWORD,
+                        name = "test_item",
+                        lore = mutableListOf(),
+                        model = 0
+                    )
+                )
+            )
+            inventorySerialization.insertOrUpdate(inventoryId, inventoryEntity)
+            inventoryEntity
         }
 
         val newEnchantSerializer = RedisCache(SerializableEnchant::class.java)

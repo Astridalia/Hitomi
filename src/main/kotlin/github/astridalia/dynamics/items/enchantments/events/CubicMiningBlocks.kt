@@ -25,6 +25,7 @@ object CubicMiningBlocks : KoinComponent, Listener {
     private val javaPlugin: JavaPlugin by inject(JavaPlugin::class.java)
     private val customEnchant = SerializableEnchant(
         `ROCK SHAPER_ENCHANT_NAME`,
+        rarity = 000000000.125,
         level = 1,
         description = "Grants the ability to manipulate stone and terrain, aiding in tunneling and construction"
     )

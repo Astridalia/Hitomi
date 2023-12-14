@@ -3,7 +3,7 @@ package github.astridalia
 import co.aikar.commands.PaperCommandManager
 import github.astridalia.commands.HitomiCommands
 import github.astridalia.dynamics.items.enchantments.events.*
-import github.astridalia.dynamics.listeners.DynamicListener
+import github.astridalia.events.DynamicListener
 import github.astridalia.events.TestItemsListener
 import github.astridalia.mobs.MobManager
 import org.bukkit.event.Listener

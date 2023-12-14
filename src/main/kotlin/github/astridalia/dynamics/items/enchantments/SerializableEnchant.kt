@@ -2,13 +2,11 @@ package github.astridalia.dynamics.items.enchantments
 
 import github.astridalia.HitomiPlugin
 import github.astridalia.database.RedisCache
-import github.astridalia.inventory.toRoman
 import github.astridalia.items.PersistentData
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bukkit.ChatColor
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
@@ -32,7 +30,6 @@ data class SerializableEnchant(
         level.toRoman()
     ).toColor(), override var rarity: Double = 0.0
 ) : IEnchant {
-
 
 
     companion object {
@@ -65,11 +62,13 @@ data class SerializableEnchant(
         }
 
         fun createLoreString(enchantName: String, level: Int): String {
-            val humanReadableName = enchantName.replace("_", " ").split(" ").joinToString(" ") { it.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(
-                    Locale.getDefault()
-                ) else it.toString()
-            } }
+            val humanReadableName = enchantName.replace("_", " ").split(" ").joinToString(" ") {
+                it.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(
+                        Locale.getDefault()
+                    ) else it.toString()
+                }
+            }
             return String.format("%s%s %s%s", ChatColor.DARK_AQUA, humanReadableName, ChatColor.BLUE, level.toRoman())
         }
 
@@ -89,7 +88,7 @@ data class SerializableEnchant(
             itemMeta.lore = (itemMeta.lore ?: mutableListOf()) - loreToRemove + loreToAdd
 
             this.setItemMeta(itemMeta)
-            return getEnchantOf(customEnchant) ?: getOrDefault(customEnchant)
+            return getEnchantOf(customEnchant)
         }
 
         private fun namespaceKey(str: String): NamespacedKey {
@@ -128,4 +127,34 @@ data class SerializableEnchant(
             return enchant.level
         }
     }
+}
+
+fun Int.toRoman(): String {
+    val romanNumerals = listOf(
+        1000 to "M",
+        900 to "CM",
+        500 to "D",
+        400 to "CD",
+        100 to "C",
+        90 to "XC",
+        50 to "L",
+        40 to "XL",
+        10 to "X",
+        9 to "IX",
+        5 to "V",
+        4 to "IV",
+        1 to "I"
+    )
+
+    var num = this
+    val result = StringBuilder()
+
+    for ((value, symbol) in romanNumerals) {
+        while (num >= value) {
+            num -= value
+            result.append(symbol)
+        }
+    }
+
+    return result.toString()
 }

@@ -3,6 +3,7 @@ package github.astridalia.commands
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
+import co.aikar.commands.annotation.Default
 import github.astridalia.database.RedisCache
 import github.astridalia.dynamics.inventories.SerializableDynamicInventory
 import github.astridalia.dynamics.items.SerializableDynamicItem
@@ -39,20 +40,23 @@ object HitomiCommands : BaseCommand() {
 
     @CommandAlias("speed")
     @CommandPermission("hitomi.mod")
-    fun speed(walk: Float, player: Player) {
+    fun speed(@Default("1.0") walk: Float, player: Player) {
         if (walk > 1f || walk < -1f) {
             player.sendMessage("Speed value must be between -1 and 1.")
             return
         }
-        if (walk == 0.2f) {
-            player.walkSpeed = 0.2f
-            player.flySpeed = 0.1f
+
+        val defaultSpeed = 0.2f
+
+        if (walk == defaultSpeed) {
+            player.walkSpeed = defaultSpeed
+            player.flySpeed = defaultSpeed / 2 // Adjust the fly speed accordingly
             player.sendMessage("Set speed to default.")
-            return
+        } else {
+            player.walkSpeed = walk
+            player.flySpeed = walk
+            player.sendMessage("Set speed to $walk.")
         }
-        player.walkSpeed = walk
-        player.flySpeed = walk
-        player.sendMessage("Set speed to $walk.")
     }
 
     @CommandAlias("item")

@@ -1,4 +1,4 @@
-package github.astridalia.dynamics.listeners
+package github.astridalia.events
 
 import github.astridalia.database.RedisCache
 import github.astridalia.dynamics.CustomDynamicActions
@@ -12,8 +12,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.event.inventory.InventoryDragEvent
-import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.persistence.PersistentDataType
 import org.litote.kmongo.id.StringId

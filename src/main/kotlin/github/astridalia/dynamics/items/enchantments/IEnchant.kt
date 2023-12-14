@@ -11,9 +11,6 @@ interface IEnchant {
 
     var display: String
 
-
-
-
     fun toSerialized(): SerializableEnchant = SerializableEnchant(
         name = name,
         description = description,
